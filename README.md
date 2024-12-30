@@ -9,3 +9,5 @@ fichier ci-joint mis à jour : https://docs.google.com/document/d/16USZ1kTuL5oL2
 16/12 mise en accord avec les camarades, début du schéma + écriture de la base SQL, mise en place sur MYSQL (phpmyadmin bientôt)
 
 30/12 -> préparation de la base de donnée + préparation du projet java et du git
+
+Préparation des visuels et analyse de l'application en cours
