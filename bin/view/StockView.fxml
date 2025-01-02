@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/javafx"
+      xmlns="http://javafx.com/javafx"
+      fx:controller="controller.StockController" spacing="10" alignment="CENTER">
+    <ListView fx:id="stockListView" prefHeight="200" prefWidth="300"/>
+    <TextField fx:id="stockNameField" promptText="Nom de l'article"/>
+    <TextField fx:id="stockQuantityField" promptText="Quantité"/>
+    <Button text="Ajouter" onAction="#addStock"/>
+</VBox>
