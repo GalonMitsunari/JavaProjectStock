@@ -1,48 +1,65 @@
 package model;
 
+import java.sql.Timestamp;
+
 public class Stock {
-	private int id;
-	private String name;
-	private int quantity;
-	private int categoryId;
+    private int id;
+    private int idProduit;
+    private int idRack;
+    private int quantite;
+    private Timestamp dateAjout;
 
-	public Stock(int id, String name, int quantity, int categoryId) {
-		this.setId(id);
-		this.setName(name);
-		this.setQuantity(quantity);
-		this.setCategoryId(categoryId);
-	}
+    public Stock(int id, int idProduit, int idRack, int quantite, Timestamp dateAjout) {
+        this.id = id;
+        this.idProduit = idProduit;
+        this.idRack = idRack;
+        this.quantite = quantite;
+        this.dateAjout = dateAjout;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public Stock(int idProduit, int idRack, int quantite) {
+        this.idProduit = idProduit;
+        this.idRack = idRack;
+        this.quantite = quantite;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public int getIdProduit() {
+        return idProduit;
+    }
 
-	public int getQuantity() {
-		return quantity;
-	}
+    public void setIdProduit(int idProduit) {
+        this.idProduit = idProduit;
+    }
 
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
+    public int getIdRack() {
+        return idRack;
+    }
 
-	public int getCategoryId() {
-		return categoryId;
-	}
+    public void setIdRack(int idRack) {
+        this.idRack = idRack;
+    }
 
-	public void setCategoryId(int categoryId) {
-		this.categoryId = categoryId;
-	}
+    public int getQuantite() {
+        return quantite;
+    }
 
+    public void setQuantite(int quantite) {
+        this.quantite = quantite;
+    }
+
+    public Timestamp getDateAjout() {
+        return dateAjout;
+    }
+
+    public void setDateAjout(Timestamp dateAjout) {
+        this.dateAjout = dateAjout;
+    }
 }
