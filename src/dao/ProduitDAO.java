@@ -86,27 +86,28 @@ public class ProduitDAO {
         }
     }
 
-    public List<Produit> getAllProduits() throws SQLException {
-	    List<Produit> produits = new ArrayList<>();
-	    String query = "SELECT * FROM Produit";
+	    public List<Produit> getAllProduits() throws SQLException {
+		    List<Produit> produits = new ArrayList<>();
+		    String query = "SELECT * FROM Produit";
 
-	    try (Connection conn = DatabaseConnection.connectToBDD();
-	         Statement stmt = conn.createStatement();
-	         ResultSet rs = stmt.executeQuery(query)) {
+		    try (Connection conn = DatabaseConnection.connectToBDD();
+		         Statement stmt = conn.createStatement();
+		         ResultSet rs = stmt.executeQuery(query)) {
 
-	        while (rs.next()) {
-	            produits.add(new Produit(
-	                rs.getInt("id"),
-	                rs.getString("nom"),
-	                rs.getString("description"),
-	                rs.getString("code_barre"),
-	                rs.getString("categorie"),
-	                rs.getTimestamp("date_creation")
-	            ));
-	        }
-	    }
+		        while (rs.next()) {
+		            produits.add(new Produit(
+		                rs.getInt("id"),
+		                rs.getString("nom"),
+		                rs.getString("description"),
+		                rs.getString("code_barre"),
+		                rs.getString("categorie"),
+		                rs.getTimestamp("date_creation").toLocalDateTime() // Conversion
+		            ));
+		        }
+		    }
 
-	    return produits;
-	}
+		    return produits;
+		}
+
 
 }

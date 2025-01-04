@@ -3,6 +3,7 @@ package controller;
 import model.Produit;
 import service.DatabaseConnection;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
@@ -46,15 +47,43 @@ public class ProduitController {
 	}
 
     @FXML
-    public void addProduit(Produit produit) throws SQLException {
-	    String query = "INSERT INTO Produit (nom, description, code_barre, categorie) VALUES (?, ?, ?, ?)";
-	    try (Connection conn = DatabaseConnection.connectToBDD();
-	         PreparedStatement pstmt = conn.prepareStatement(query)) {
-	        pstmt.setString(1, produit.getNom());
-	        pstmt.setString(2, produit.getDescription());
-	        pstmt.setString(3, produit.getCodeBarre());
-	        pstmt.setString(4, produit.getCategorie());
-	        pstmt.executeUpdate();
-	    }
-	}
+    private void addProduit() {
+        try {
+            if (produitNomField.getText().isEmpty() || produitCodeBarreField.getText().isEmpty()) {
+                showError("Erreur", "Veuillez remplir tous les champs obligatoires.");
+                return;
+            }
+
+            Produit produit = new Produit(
+                0, // L'ID sera généré automatiquement
+                produitNomField.getText(),
+                produitDescriptionField.getText(),
+                produitCodeBarreField.getText(),
+                produitCategorieField.getText(),
+                null // La date sera gérée par MySQL
+            );
+
+            produitDAO.create(produit); // Utilise le DAO pour insérer
+            loadProduits(); // Rafraîchit la liste
+            clearFields(); // Réinitialise les champs
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showError("Erreur", "Impossible d'ajouter le produit. Vérifiez les doublons sur le code-barre.");
+        }
+    }
+
+    private void clearFields() {
+        produitNomField.clear();
+        produitDescriptionField.clear();
+        produitCodeBarreField.clear();
+        produitCategorieField.clear();
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 }
