@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controller.FichierHistoriqueController">
+    <Label text="Gestion des Fichiers Historiques"/>
+    <ListView fx:id="fichierListView"/>
+    <Label text="Nom du fichier"/>
+    <TextField fx:id="fichierNomField"/>
+    <Label text="Statut"/>
+    <ChoiceBox fx:id="statusChoiceBox"/>
+    <Label text="Erreurs (optionnel)"/>
+    <TextArea fx:id="erreursArea"/>
+    <HBox spacing="10">
+        <Button text="Ajouter Fichier" onAction="#addFichier"/>
+        <Button text="Supprimer Fichier" onAction="#deleteFichier"/>
+    </HBox>
+</VBox>

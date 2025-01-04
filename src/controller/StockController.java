@@ -31,19 +31,20 @@ public class StockController {
     }
 
     private void configureStockListView() {
-        stockListView.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(Stock stock, boolean empty) {
-                super.updateItem(stock, empty);
-                if (empty || stock == null) {
-                    setText(null);
-                } else {
-                    setText("Produit ID: " + stock.getIdProduit() +
-                            ", Rack ID: " + stock.getIdRack() +
-                            ", Quantité: " + stock.getQuantite());
-                }
-            }
-        });
+	    stockListView.setCellFactory(param -> new ListCell<Stock>() {
+		    @Override
+		    protected void updateItem(Stock stock, boolean empty) {
+		        super.updateItem(stock, empty);
+		        if (empty || stock == null) {
+		            setText(null);
+		        } else {
+		            setText("Produit ID: " + stock.getIdProduit() +
+		                    ", Rack ID: " + stock.getIdRack() +
+		                    ", Quantité: " + stock.getQuantite());
+		        }
+		    }
+		});
+
     }
 
 
