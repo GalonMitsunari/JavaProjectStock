@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.MenuController"
+      alignment="CENTER" spacing="20">
+    <padding>
+        <Insets top="20" bottom="20" left="20" right="20"/>
+    </padding>
+
+    <Label text="Menu Principal" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    <Button text="Gérer les Produits" onAction="#goToProduitView" />
+    <Button text="Gérer les Racks" onAction="#goToRackView" />
+    <Button text="Gérer les Stocks" onAction="#goToStockView" />
+    <Button text="Gérer les Mouvements" onAction="#goToMouvementView" />
+</VBox>
