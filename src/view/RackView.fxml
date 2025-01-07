@@ -2,7 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="10" xmlns:fx="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controller.RackController">
+<VBox spacing="10" xmlns:fx="http://javafx.com/fxml" fx:controller="controller.RackController">
     <Label text="Gestion des Racks"/>
     <ListView fx:id="rackListView"/>
     <Label text="Référence"/>
