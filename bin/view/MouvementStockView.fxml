@@ -2,7 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="10" xmlns:fx="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="controller.MouvementStockController">
+<VBox spacing="10" xmlns:fx="http://javafx.com/fxml" fx:controller="controller.MouvementStockController">
     <Label text="Gestion des Mouvements de Stock"/>
     <ListView fx:id="mouvementListView"/>
     <Label text="Produit ID"/>

@@ -7,7 +7,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import model.Stock;
+import service.DatabaseConnection;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -32,20 +35,19 @@ public class StockController {
 
     private void configureStockListView() {
 	    stockListView.setCellFactory(param -> new ListCell<Stock>() {
-		    @Override
-		    protected void updateItem(Stock stock, boolean empty) {
-		        super.updateItem(stock, empty);
-		        if (empty || stock == null) {
-		            setText(null);
-		        } else {
-		            setText("Produit ID: " + stock.getIdProduit() +
-		                    ", Rack ID: " + stock.getIdRack() +
-		                    ", Quantité: " + stock.getQuantite());
-		        }
-		    }
-		});
-
-    }
+	        @Override
+	        protected void updateItem(Stock stock, boolean empty) {
+	            super.updateItem(stock, empty);
+	            if (empty || stock == null) {
+	                setText(null);
+	            } else {
+	                setText("Produit ID: " + stock.getIdProduit() +
+	                        ", Rack ID: " + stock.getIdRack() +
+	                        ", Quantité: " + stock.getQuantite());
+	            }
+	        }
+	    });
+	}
 
 
     private void loadStocks() {
@@ -58,39 +60,62 @@ public class StockController {
         }
     }
 
-
     @FXML
     private void addStock() {
         try {
+            if (!areFieldsValid()) {
+                System.out.println("Veuillez remplir tous les champs.");
+                return;
+            }
+
             int idProduit = Integer.parseInt(stockIdProduitField.getText());
             int idRack = Integer.parseInt(stockIdRackField.getText());
             int quantite = Integer.parseInt(stockQuantiteField.getText());
 
-            Stock newStock = new Stock(0, idProduit, idRack, quantite, null);
+            if (!doesProduitExist(idProduit)) {
+                System.out.println("Produit avec l'ID " + idProduit + " n'existe pas.");
+                return;
+            }
+
+            if (!doesRackExist(idRack)) {
+                System.out.println("Rack avec l'ID " + idRack + " n'existe pas.");
+                return;
+            }
+
+            Stock newStock = new Stock(idProduit, idRack, quantite);
             stockDAO.addStock(newStock);
 
             loadStocks();
             clearFields();
-        } catch (SQLException | NumberFormatException e) {
+        } catch (NumberFormatException e) {
+            System.out.println("Veuillez entrer des valeurs numériques valides.");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            System.out.println("Erreur SQL lors de l'ajout du stock.");
             e.printStackTrace();
         }
     }
+
+
 
     @FXML
     private void updateStock() {
         try {
             Stock selectedStock = stockListView.getSelectionModel().getSelectedItem();
             if (selectedStock == null) {
+                System.err.println("Aucun stock sélectionné !");
                 return;
             }
 
-            int quantite = Integer.parseInt(stockQuantiteField.getText());
-            selectedStock.setQuantite(quantite);
+            if (areFieldsValid()) {
+                int quantite = Integer.parseInt(stockQuantiteField.getText());
+                selectedStock.setQuantite(quantite);
 
-            stockDAO.updateStock(selectedStock);
-            loadStocks();
-            clearFields();
-        } catch (SQLException | NumberFormatException e) {
+                stockDAO.updateStock(selectedStock);
+                loadStocks();
+                clearFields();
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -100,6 +125,7 @@ public class StockController {
         try {
             Stock selectedStock = stockListView.getSelectionModel().getSelectedItem();
             if (selectedStock == null) {
+                System.err.println("Aucun stock sélectionné !");
                 return;
             }
 
@@ -125,4 +151,48 @@ public class StockController {
         stockIdRackField.clear();
         stockQuantiteField.clear();
     }
+
+    private boolean areFieldsValid() {
+        if (stockIdProduitField.getText().isEmpty() || stockIdRackField.getText().isEmpty() || stockQuantiteField.getText().isEmpty()) {
+            System.err.println("Tous les champs doivent être remplis !");
+            return false;
+        }
+
+        try {
+            Integer.parseInt(stockIdProduitField.getText());
+            Integer.parseInt(stockIdRackField.getText());
+            Integer.parseInt(stockQuantiteField.getText());
+        } catch (NumberFormatException e) {
+            System.err.println("Les champs ID Produit, ID Rack et Quantité doivent être des nombres !");
+            return false;
+        }
+
+        return true;
+    }
+    private boolean doesProduitExist(int idProduit) {
+	    try (Connection conn = DatabaseConnection.connectToBDD();
+	         java.sql.PreparedStatement pstmt = conn.prepareStatement("SELECT 1 FROM Produit WHERE id = ?")) {
+	        pstmt.setInt(1, idProduit);
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            return rs.next();
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
+	private boolean doesRackExist(int idRack) {
+	    try (Connection conn = DatabaseConnection.connectToBDD();
+	         java.sql.PreparedStatement pstmt = conn.prepareStatement("SELECT 1 FROM Rack WHERE id = ?")) {
+	        pstmt.setInt(1, idRack);
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            return rs.next();
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
 }

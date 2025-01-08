@@ -29,19 +29,26 @@ public class MouvementStockDAO {
 	}
 
 	public List<MouvementStock> getAllMouvements() throws SQLException {
-		List<MouvementStock> mouvements = new ArrayList<>();
-		try (Connection conn = DatabaseConnection.connectToBDD();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(SELECT_ALL_MOUVEMENTS)) {
-			while (rs.next()) {
-				mouvements.add(new MouvementStock(rs.getInt("id"), rs.getInt("id_produit"),
-						rs.getString("type_mouvement"), rs.getInt("quantite"),
-						rs.getObject("id_rack", Integer.class),
-						rs.getTimestamp("date_mouvement").toLocalDateTime()));
-			}
+		    List<MouvementStock> mouvements = new ArrayList<>();
+		    try (Connection conn = DatabaseConnection.connectToBDD();
+		         Statement stmt = conn.createStatement();
+		         ResultSet rs = stmt.executeQuery(SELECT_ALL_MOUVEMENTS)) {
+
+		        while (rs.next()) {
+		            Integer idRack = (rs.getObject("id_rack") != null) ? rs.getInt("id_rack") : null; // Gestion manuelle de null
+		            mouvements.add(new MouvementStock(
+		                rs.getInt("id"),
+		                rs.getInt("id_produit"),
+		                rs.getString("type_mouvement"),
+		                rs.getInt("quantite"),
+		                idRack,
+		                rs.getTimestamp("date_mouvement").toLocalDateTime()
+		            ));
+		        }
+		    }
+		    return mouvements;
 		}
-		return mouvements;
-	}
+
 
 	public void deleteMouvementById(int id) throws SQLException {
 		try (Connection conn = DatabaseConnection.connectToBDD();
