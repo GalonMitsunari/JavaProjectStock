@@ -1,5 +1,7 @@
 package Application;
 
+import java.io.IOException;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -11,24 +13,22 @@ public class Main extends Application {
     private static Stage primaryStage;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Exception {
         Main.primaryStage = primaryStage;
-        changeScene("MenuView.fxml", "Menu Principal");
+        changeScene("MenuView.fxml");
     }
 
-    public static void changeScene(String fxmlFile, String title) {
-	    try {
-	        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/view/" + fxmlFile));
-	        VBox root = loader.load();
-	        Scene scene = new Scene(root);
-	        primaryStage.setScene(scene);
-	        primaryStage.setTitle(title);
-	        primaryStage.show();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        System.err.println("Erreur lors du chargement de la vue : " + fxmlFile);
+    public static void changeScene(String fxml) {
+	        try {
+	            FXMLLoader loader = new FXMLLoader(Main.class.getResource("/view/" + fxml));
+	            Scene scene = new Scene(loader.load());
+	            primaryStage.setScene(scene);
+	            primaryStage.show();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            System.err.println("Erreur lors du chargement de la vue : " + fxml);
+	        }
 	    }
-	}
 
 
     public static void main(String[] args) {

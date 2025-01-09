@@ -6,22 +6,22 @@ import javafx.fxml.FXML;
 public class MenuController {
 	    @FXML
 	    public void goToProduitView() {
-	        Main.changeScene("ProduitView.fxml", "Gestion des Produits");
+	        Main.changeScene("ProduitView.fxml");
 	    }
 
 	    @FXML
 	    public void goToRackView() {
-	        Main.changeScene("RackView.fxml", "Gestion des Racks");
+	        Main.changeScene("RackView.fxml");
 	    }
 
 	    @FXML
 	    public void goToStockView() {
-	        Main.changeScene("StockView.fxml", "Gestion des Stocks");
+	        Main.changeScene("StockView.fxml");
 	    }
 
 	    @FXML
 	    public void goToMouvementView() {
-	        Main.changeScene("MouvementStockView.fxml", "Gestion des Mouvements de Stock");
+	        Main.changeScene("MouvementStockView.fxml");
 	    }
 	}
 

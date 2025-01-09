@@ -11,6 +11,8 @@ import model.FichierHistorique;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+import Application.Main;
+
 public class FichierHistoriqueController {
 
     @FXML
@@ -28,6 +30,11 @@ public class FichierHistoriqueController {
     public void initialize() {
         statusChoiceBox.getItems().addAll("SUCCES", "ERREUR");
         loadFichiers();
+    }
+    // Méthode pour retourner au menu principal
+    @FXML
+    private void goToMenu() {
+        Main.changeScene("MenuView.fxml");
     }
 
     private void loadFichiers() {

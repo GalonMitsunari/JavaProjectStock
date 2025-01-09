@@ -10,6 +10,8 @@ import model.MouvementStock;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+import Application.Main;
+
 public class MouvementStockController {
 
     @FXML
@@ -29,6 +31,11 @@ public class MouvementStockController {
     public void initialize() {
         typeMouvementChoiceBox.getItems().addAll("ENTREE", "SORTIE");
         loadMouvements();
+    }
+    // Méthode pour retourner au menu principal
+    @FXML
+    private void goToMenu() {
+        Main.changeScene("MenuView.fxml");
     }
 
     private void loadMouvements() {

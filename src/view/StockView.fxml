@@ -10,4 +10,5 @@
     <TextField fx:id="stockIdRackField" promptText="ID du rack"/>
     <TextField fx:id="stockQuantiteField" promptText="Quantité"/>
     <Button text="Ajouter" onAction="#addStock"/>
+    <Button text="Retour" onAction="#goToMenu" />
 </VBox>

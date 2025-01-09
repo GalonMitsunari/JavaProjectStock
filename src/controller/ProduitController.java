@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
+import Application.Main;
 import dao.ProduitDAO;
 
 public class ProduitController {
@@ -33,7 +34,11 @@ public class ProduitController {
     public void initialize() {
         loadProduits();
     }
-
+    // Méthode pour retourner au menu principal
+    @FXML
+    private void goToMenu() {
+        Main.changeScene("MenuView.fxml");
+    }
     private void loadProduits() {
 	    try {
 	        produitListView.getItems().clear(); 

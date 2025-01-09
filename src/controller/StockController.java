@@ -14,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import Application.Main;
+
 public class StockController {
 
     @FXML
@@ -32,7 +34,11 @@ public class StockController {
         configureStockListView();
         loadStocks();
     }
-
+    // Méthode pour retourner au menu principal
+    @FXML
+    private void goToMenu() {
+        Main.changeScene("MenuView.fxml");
+    }
     private void configureStockListView() {
 	    stockListView.setCellFactory(param -> new ListCell<Stock>() {
 	        @Override

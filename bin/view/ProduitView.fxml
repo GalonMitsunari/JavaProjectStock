@@ -12,4 +12,5 @@
     <TextField fx:id="produitCodeBarreField" promptText="Code-barres"/>
     <TextField fx:id="produitCategorieField" promptText="Catégorie"/>
     <Button text="Ajouter Produit" onAction="#addProduit"/>
+    <Button text="Retour" onAction="#goToMenu" />
 </VBox>

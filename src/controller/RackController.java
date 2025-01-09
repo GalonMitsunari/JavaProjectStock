@@ -8,6 +8,8 @@ import model.Rack;
 
 import java.sql.SQLException;
 
+import Application.Main;
+
 public class RackController {
     @FXML
     private ListView<String> rackListView;
@@ -26,7 +28,11 @@ public class RackController {
     public void initialize() {
         loadRacks();
     }
-
+    // Méthode pour retourner au menu principal
+    @FXML
+    private void goToMenu() {
+        Main.changeScene("MenuView.fxml");
+    }
     private void loadRacks() {
         try {
             rackListView.getItems().clear();

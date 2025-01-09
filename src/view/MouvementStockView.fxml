@@ -14,4 +14,5 @@
     <Label text="Rack ID (optionnel)"/>
     <TextField fx:id="rackIdField"/>
     <Button text="Ajouter Mouvement" onAction="#addMouvement"/>
+    <Button text="Retour" onAction="#goToMenu" />
 </VBox>

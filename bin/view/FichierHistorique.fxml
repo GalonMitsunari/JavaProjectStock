@@ -14,5 +14,6 @@
     <HBox spacing="10">
         <Button text="Ajouter Fichier" onAction="#addFichier"/>
         <Button text="Supprimer Fichier" onAction="#deleteFichier"/>
+        <Button text="Retour" onAction="#goToMenu" />
     </HBox>
 </VBox>
