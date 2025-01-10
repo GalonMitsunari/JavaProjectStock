@@ -60,4 +60,58 @@ public class RackController {
             e.printStackTrace();
         }
     }
+    
+    @FXML
+    private void updateRack() {
+        try {
+            Rack selectedRack = rackListView.getSelectionModel().getSelectedItem();
+            if (selectedRack == null) {
+                showError("Erreur", "Veuillez sélectionner un rack.");
+                return;
+            }
+            selectedRack.setReference(rackReferenceField.getText());
+            selectedRack.setCapaciteMax(Integer.parseInt(rackCapaciteMaxField.getText()));
+            selectedRack.setDescription(rackDescriptionField.getText());
+            selectedRack.setEmplacement(rackEmplacementField.getText());
+
+            rackDAO.updateRack(selectedRack);
+            loadRacks();
+            clearFields();
+        } catch (SQLException | NumberFormatException e) {
+            e.printStackTrace();
+            showError("Erreur", "Impossible de mettre à jour le rack.");
+        }
+    }
+
+    @FXML
+    private void deleteRack() {
+        try {
+            Rack selectedRack = rackListView.getSelectionModel().getSelectedItem();
+            if (selectedRack == null) {
+                showError("Erreur", "Veuillez sélectionner un rack.");
+                return;
+            }
+
+            rackDAO.deleteRackById(selectedRack.getId()); // Appel au DAO
+            loadRacks(); // Rafraîchit la liste
+            clearFields(); // Réinitialise les champs
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showError("Erreur", "Impossible de supprimer le rack.");
+        }
+    }
+
+    private void clearFields() {
+        rackReferenceField.clear();
+        rackCapaciteMaxField.clear();
+        rackDescriptionField.clear();
+        rackEmplacementField.clear();
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

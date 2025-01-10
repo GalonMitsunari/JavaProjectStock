@@ -64,27 +64,27 @@ public class ProduitDAO {
         return produits;
     }
 
-    public void update(Produit produit) throws SQLException {
-        String query = "UPDATE " + TABLE_NAME + " SET nom = ?, description = ?, code_barre = ?, categorie = ? WHERE id = ?";
-        try (Connection conn = DatabaseConnection.connectToBDD();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setString(1, produit.getNom());
-            pstmt.setString(2, produit.getDescription());
-            pstmt.setString(3, produit.getCodeBarre());
-            pstmt.setString(4, produit.getCategorie());
-            pstmt.setInt(5, produit.getId());
-            pstmt.executeUpdate();
-        }
-    }
+    public void updateProduit(Produit produit) throws SQLException {
+	        String query = "UPDATE Produit SET nom = ?, description = ?, code_barre = ?, categorie = ? WHERE id = ?";
+	        try (Connection conn = DatabaseConnection.connectToBDD();
+	             PreparedStatement pstmt = conn.prepareStatement(query)) {
+	            pstmt.setString(1, produit.getNom());
+	            pstmt.setString(2, produit.getDescription());
+	            pstmt.setString(3, produit.getCodeBarre());
+	            pstmt.setString(4, produit.getCategorie());
+	            pstmt.setInt(5, produit.getId());
+	            pstmt.executeUpdate();
+	        }
+	    }
 
-    public void delete(int id) throws SQLException {
-        String query = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
-        try (Connection conn = DatabaseConnection.connectToBDD();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        }
-    }
+	    public void deleteProduitById(int id) throws SQLException {
+	        String query = "DELETE FROM Produit WHERE id = ?";
+	        try (Connection conn = DatabaseConnection.connectToBDD();
+	             PreparedStatement pstmt = conn.prepareStatement(query)) {
+	            pstmt.setInt(1, id);
+	            pstmt.executeUpdate();
+	        }
+	    }
 
 	    public List<Produit> getAllProduits() throws SQLException {
 		    List<Produit> produits = new ArrayList<>();

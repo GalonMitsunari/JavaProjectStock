@@ -1,5 +1,6 @@
 package dao;
 
+import model.Produit;
 import model.Rack;
 import service.DatabaseConnection;
 
@@ -21,6 +22,28 @@ public class RackDAO {
             pstmt.executeUpdate();
         }
     }
+    
+    public void updateRack(Rack rack) throws SQLException {
+	        String query = "UPDATE Rack SET reference = ?, capacite_max = ?, description = ?, emplacement = ? WHERE id = ?";
+	        try (Connection conn = DatabaseConnection.connectToBDD();
+	             PreparedStatement pstmt = conn.prepareStatement(query)) {
+		            pstmt.setString(1, rack.getReference());
+		            pstmt.setInt(2, rack.getCapaciteMax());
+		            pstmt.setString(3, rack.getDescription());
+		            pstmt.setString(4, rack.getEmplacement());
+	            pstmt.setInt(5, rack.getId());
+	            pstmt.executeUpdate();
+	        }
+	    }
+
+	    public void deleteRackById(int id) throws SQLException {
+	        String query = "DELETE FROM Rack WHERE id = ?";
+	        try (Connection conn = DatabaseConnection.connectToBDD();
+	             PreparedStatement pstmt = conn.prepareStatement(query)) {
+	            pstmt.setInt(1, id);
+	            pstmt.executeUpdate();
+	        }
+	    }
 
     public List<Rack> getAllRacks() throws SQLException {
         List<Rack> racks = new ArrayList<>();

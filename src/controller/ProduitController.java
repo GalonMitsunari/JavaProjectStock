@@ -27,6 +27,9 @@ public class ProduitController {
     private TextField produitCodeBarreField;
     @FXML
     private TextField produitCategorieField;
+    @FXML
+    private TextField produitIdField;
+
 
     private ProduitDAO produitDAO = new ProduitDAO();
 
@@ -74,6 +77,40 @@ public class ProduitController {
         } catch (SQLException e) {
             e.printStackTrace();
             showError("Erreur", "Impossible d'ajouter le produit. Vérifiez les doublons sur le code-barre.");
+        }
+    }
+    
+    @FXML
+    private void updateProduit() {
+        try {
+            int id = Integer.parseInt(produitIdField.getText());
+            Produit produit = new Produit(
+                id,
+                produitNomField.getText(),
+                produitDescriptionField.getText(),
+                produitCodeBarreField.getText(),
+                produitCategorieField.getText(),
+                null
+            );
+            produitDAO.updateProduit(produit);
+            loadProduits();
+            clearFields();
+        } catch (SQLException | NumberFormatException e) {
+            e.printStackTrace();
+            showError("Erreur", "Impossible de mettre à jour le produit.");
+        }
+    }
+
+    @FXML
+    private void deleteProduit() {
+        try {
+            int id = Integer.parseInt(produitIdField.getText());
+            produitDAO.deleteProduitById(id);
+            loadProduits();
+            clearFields();
+        } catch (SQLException | NumberFormatException e) {
+            e.printStackTrace();
+            showError("Erreur", "Impossible de supprimer le produit.");
         }
     }
 
