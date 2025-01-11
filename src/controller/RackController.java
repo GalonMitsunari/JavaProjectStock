@@ -2,8 +2,10 @@ package controller;
 
 import dao.RackDAO;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import model.Produit;
 import model.Rack;
 
 import java.sql.SQLException;
@@ -64,17 +66,19 @@ public class RackController {
     @FXML
     private void updateRack() {
         try {
-            Rack selectedRack = rackListView.getSelectionModel().getSelectedItem();
+            String selectedRack = rackListView.getSelectionModel().getSelectedItem();
             if (selectedRack == null) {
                 showError("Erreur", "Veuillez sélectionner un rack.");
                 return;
             }
+
             selectedRack.setReference(rackReferenceField.getText());
             selectedRack.setCapaciteMax(Integer.parseInt(rackCapaciteMaxField.getText()));
             selectedRack.setDescription(rackDescriptionField.getText());
             selectedRack.setEmplacement(rackEmplacementField.getText());
 
             rackDAO.updateRack(selectedRack);
+
             loadRacks();
             clearFields();
         } catch (SQLException | NumberFormatException e) {
@@ -83,23 +87,20 @@ public class RackController {
         }
     }
 
+
     @FXML
     private void deleteRack() {
         try {
-            Rack selectedRack = rackListView.getSelectionModel().getSelectedItem();
-            if (selectedRack == null) {
-                showError("Erreur", "Veuillez sélectionner un rack.");
-                return;
-            }
-
-            rackDAO.deleteRackById(selectedRack.getId()); // Appel au DAO
-            loadRacks(); // Rafraîchit la liste
-            clearFields(); // Réinitialise les champs
-        } catch (SQLException e) {
+            int id = Integer.parseInt(rackReferenceField.getText());
+            rackDAO.deleteRackById(id);
+            loadRacks(); 
+            clearFields();
+        } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();
-            showError("Erreur", "Impossible de supprimer le rack.");
+            showError("Erreur", "Impossible de supprimer le produit.");
         }
     }
+
 
     private void clearFields() {
         rackReferenceField.clear();

@@ -12,8 +12,7 @@
     <Label text="Description"/>
     <TextField fx:id="rackDescriptionField"/>
     <Label text="Emplacement"/>
-    <TextField fx:id="rackEmplacementField"/>
-    <TextField fx:id="rackEmplacementField" promptText="Emplacement"/>
+    <ListView fx:id="rackListView" />
     <Button text="Ajouter Rack" onAction="#addRack"/>
     <Button text="Mettre à Jour Rack" onAction="#updateRack"/>
     <Button text="Supprimer Rack" onAction="#deleteRack"/>
