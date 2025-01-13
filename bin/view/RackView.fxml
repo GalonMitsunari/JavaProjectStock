@@ -4,15 +4,12 @@
 
 <VBox spacing="10" xmlns:fx="http://javafx.com/fxml" fx:controller="controller.RackController">
     <Label text="Gestion des Racks"/>
-    <ListView fx:id="rackListView"/>
-    <Label text="Référence"/>
-    <TextField fx:id="rackReferenceField"/>
-    <Label text="Capacité Max"/>
-    <TextField fx:id="rackCapaciteMaxField"/>
-    <Label text="Description"/>
-    <TextField fx:id="rackDescriptionField"/>
     <Label text="Emplacement"/>
     <ListView fx:id="rackListView" />
+    <TextField fx:id="rackReferenceField" promptText="Référence du Rack" />
+<TextField fx:id="rackCapaciteMaxField" promptText="Capacité Max" />
+<TextField fx:id="rackDescriptionField" promptText="Description" />
+<TextField fx:id="rackEmplacementField" promptText="Emplacement" />
     <Button text="Ajouter Rack" onAction="#addRack"/>
     <Button text="Mettre à Jour Rack" onAction="#updateRack"/>
     <Button text="Supprimer Rack" onAction="#deleteRack"/>

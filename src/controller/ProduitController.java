@@ -47,7 +47,7 @@ public class ProduitController {
 	        produitListView.getItems().clear(); 
 	        List<Produit> produits = produitDAO.getAllProduits(); 
 	        for (Produit produit : produits) {
-	            produitListView.getItems().add(produit.getNom() + " (" + produit.getCategorie() + ")");
+	            produitListView.getItems().add(produit.getId() + " : " + produit.getNom() + " (" + produit.getCategorie() + ")");
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();

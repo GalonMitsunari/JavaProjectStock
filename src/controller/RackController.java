@@ -39,7 +39,7 @@ public class RackController {
         try {
             rackListView.getItems().clear();
             for (Rack rack : rackDAO.getAllRacks()) {
-                rackListView.getItems().add(rack.getReference() + " - " + rack.getEmplacement());
+                rackListView.getItems().add(rack.getId() + " : " + rack.getReference() + " - " + rack.getCapaciteMax() + " - " + rack.getDescription() + " - " + rack.getEmplacement());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -66,18 +66,23 @@ public class RackController {
     @FXML
     private void updateRack() {
         try {
-            String selectedRack = rackListView.getSelectionModel().getSelectedItem();
-            if (selectedRack == null) {
-                showError("Erreur", "Veuillez sélectionner un rack.");
+            String reference = rackReferenceField.getText();
+            if (reference.isEmpty()) {
+                showError("Erreur", "Veuillez saisir une référence pour identifier le rack.");
                 return;
             }
 
-            selectedRack.setReference(rackReferenceField.getText());
-            selectedRack.setCapaciteMax(Integer.parseInt(rackCapaciteMaxField.getText()));
-            selectedRack.setDescription(rackDescriptionField.getText());
-            selectedRack.setEmplacement(rackEmplacementField.getText());
+            Rack rack = rackDAO.getRackByReference(reference);
+            if (rack == null) {
+                showError("Erreur", "Aucun rack trouvé avec la référence saisie.");
+                return;
+            }
 
-            rackDAO.updateRack(selectedRack);
+            rack.setCapaciteMax(Integer.parseInt(rackCapaciteMaxField.getText()));
+            rack.setDescription(rackDescriptionField.getText());
+            rack.setEmplacement(rackEmplacementField.getText());
+
+            rackDAO.updateRack(rack);
 
             loadRacks();
             clearFields();
@@ -88,18 +93,33 @@ public class RackController {
     }
 
 
+
     @FXML
     private void deleteRack() {
         try {
-            int id = Integer.parseInt(rackReferenceField.getText());
+            if (rackReferenceField.getText().isEmpty()) {
+                showError("Erreur", "Veuillez saisir une référence de rack valide.");
+                return;
+            }
+
+            int id;
+            try {
+                id = Integer.parseInt(rackReferenceField.getText());
+            } catch (NumberFormatException e) {
+                showError("Erreur", "La référence du rack doit être un numéro valide.");
+                return;
+            }
+
             rackDAO.deleteRackById(id);
-            loadRacks(); 
+
+            loadRacks();
             clearFields();
-        } catch (SQLException | NumberFormatException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            showError("Erreur", "Impossible de supprimer le produit.");
+            showError("Erreur", "Impossible de supprimer le rack.");
         }
     }
+
 
 
     private void clearFields() {

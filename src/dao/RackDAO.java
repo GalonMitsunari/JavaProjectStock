@@ -62,4 +62,24 @@ public class RackDAO {
         }
         return racks;
     }
+    public Rack getRackByReference(String reference) throws SQLException {
+	    String query = "SELECT * FROM Rack WHERE id = ?";
+	    try (Connection conn = DatabaseConnection.connectToBDD();
+	         PreparedStatement pstmt = conn.prepareStatement(query)) {
+	        pstmt.setString(1, reference);
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return new Rack(
+	                        rs.getInt("id"),
+	                        rs.getString("reference"),
+	                        rs.getInt("capacite_max"),
+	                        rs.getString("description"),
+	                        rs.getString("emplacement")
+	                );
+	            }
+	        }
+	    }
+	    return null; 
+	}
+
 }
