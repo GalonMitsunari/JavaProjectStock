@@ -20,7 +20,6 @@ public class MouvementStock {
 		this.quantite = quantite;
 		this.idRack = idRack;
 		this.dateMouvement = dateMouvement;
-		//this.produit = produit;  // Initialisation de produit
 	}
 
 	public int getId() {

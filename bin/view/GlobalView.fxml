@@ -42,17 +42,19 @@
             </HBox>
         </VBox>
     </Tab>
-    <Tab text="Stock Actuel">
+    
+<Tab text="Stock Actuel">
     <VBox spacing="10" alignment="CENTER">
         <Label text="Stock Actuel des Produits" style="-fx-font-size: 16px;" />
-        <TableView fx:id="stockTableView" prefHeight="200" prefWidth="600">
-            <columns>
-                <TableColumn text="Produit" fx:id="produitColumn" />
-                <TableColumn text="Quantité Disponible" fx:id="quantiteColumn" />
-            </columns>
-        </TableView>
+        <ListView fx:id="stockListView" prefHeight="200" prefWidth="600" />
+        <HBox spacing="10">
+            <TextField fx:id="produitColumn" promptText="Produit" />
+            <TextField fx:id="quantiteColumn" promptText="Quantité Disponible" />
+        </HBox>
     </VBox>
 </Tab>
+
+
 
     <Tab text="Mouvements de Stock">
         <VBox alignment="CENTER" spacing="10">

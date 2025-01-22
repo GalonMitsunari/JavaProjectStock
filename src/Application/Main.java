@@ -15,7 +15,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		Main.primaryStage = primaryStage;
-		changeScene("MenuView.fxml");
+		changeScene("GlobalView.fxml");
 	}
 
 	public static void changeScene(String fxml) {

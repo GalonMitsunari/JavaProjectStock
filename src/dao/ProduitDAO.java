@@ -24,7 +24,23 @@ public class ProduitDAO {
 		}
 	}
 
-	public Produit readById(int id) throws SQLException {
+	public List<Produit> readAll() throws SQLException {
+		List<Produit> produits = new ArrayList<>();
+		String query = "SELECT * FROM " + TABLE_NAME;
+		try (Connection conn = DatabaseConnection.connectToBDD();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(query)) {
+			while (rs.next()) {
+				produits.add(new Produit(rs.getInt("id"), rs.getString("nom"),
+						rs.getString("description"), rs.getString("code_barre"),
+						rs.getString("categorie"),
+						rs.getTimestamp("date_creation").toLocalDateTime()));
+			}
+		}
+		return produits;
+	}
+
+	public Produit readProduitById(int id) throws SQLException {
 		String query = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
 		try (Connection conn = DatabaseConnection.connectToBDD();
 				PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -43,22 +59,6 @@ public class ProduitDAO {
 		return null;
 	}
 
-	public List<Produit> readAll() throws SQLException {
-		List<Produit> produits = new ArrayList<>();
-		String query = "SELECT * FROM " + TABLE_NAME;
-		try (Connection conn = DatabaseConnection.connectToBDD();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(query)) {
-			while (rs.next()) {
-				produits.add(new Produit(rs.getInt("id"), rs.getString("nom"),
-						rs.getString("description"), rs.getString("code_barre"),
-						rs.getString("categorie"),
-						rs.getTimestamp("date_creation").toLocalDateTime()));
-			}
-		}
-		return produits;
-	}
-
 	public void updateProduit(Produit produit) throws SQLException {
 		String query = "UPDATE Produit SET nom = ?, description = ?, code_barre = ?, categorie = ? WHERE id = ?";
 		try (Connection conn = DatabaseConnection.connectToBDD();
@@ -73,7 +73,7 @@ public class ProduitDAO {
 	}
 
 	public void deleteProduitById(int id) throws SQLException {
-		String query = "DELETE FROM Produit WHERE id = ?";
+		String query = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
 		try (Connection conn = DatabaseConnection.connectToBDD();
 				PreparedStatement pstmt = conn.prepareStatement(query)) {
 			pstmt.setInt(1, id);
@@ -82,23 +82,6 @@ public class ProduitDAO {
 	}
 
 	public List<Produit> getAllProduits() throws SQLException {
-		List<Produit> produits = new ArrayList<>();
-		String query = "SELECT * FROM Produit";
-
-		try (Connection conn = DatabaseConnection.connectToBDD();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(query)) {
-
-			while (rs.next()) {
-				produits.add(new Produit(rs.getInt("id"), rs.getString("nom"),
-						rs.getString("description"), rs.getString("code_barre"),
-						rs.getString("categorie"),
-						rs.getTimestamp("date_creation").toLocalDateTime() // Conversion
-				));
-			}
-		}
-
-		return produits;
+		return readAll();
 	}
-
 }

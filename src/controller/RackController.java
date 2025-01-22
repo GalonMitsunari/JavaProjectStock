@@ -31,7 +31,6 @@ public class RackController {
 		loadRacks();
 	}
 
-	// Méthode pour retourner au menu principal
 	@FXML
 	private void goToMenu() {
 		Main.changeScene("MenuView.fxml");

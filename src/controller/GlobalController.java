@@ -1,13 +1,18 @@
 package controller;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import model.Produit;
 import model.Rack;
+import model.Stock;
 import model.MouvementStock;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import dao.MouvementStockDAO;
@@ -17,29 +22,29 @@ import dao.StockDAO;
 
 public class GlobalController {
 
-	// Produits
 	@FXML
 	private ListView<Produit> produitListView;
 	@FXML
 	private TextField produitIdField, produitNomField, produitDescriptionField, produitCodeBarreField,
 			produitCategorieField;
 
-	// Racks
 	@FXML
 	private ListView<Rack> rackListView;
 	@FXML
 	private TextField rackIdField, rackReferenceField, rackCapaciteMaxField, rackDescriptionField,
 			rackEmplacementField;
 
-	// Mouvements
 	@FXML
 	private ListView<MouvementStock> mouvementListView;
 	@FXML
 	private TextField mouvementProduitField, mouvementQuantiteField, mouvementRackField;
 
-	// Historique
 	@FXML
 	private TableView<MouvementStock> historiqueTableView;
+	@FXML
+	private ListView<String> stockListView;
+	private TextField produitColumn, quantiteColumn;
+
 
 	private final ProduitDAO produitDAO = new ProduitDAO();
 	private final RackDAO rackDAO = new RackDAO();
@@ -51,6 +56,7 @@ public class GlobalController {
 		loadProduits();
 		loadRacks();
 		loadMouvements();
+		loadStocks();
 	}
 
 	private void loadProduits() {
@@ -76,6 +82,29 @@ public class GlobalController {
 			showError("Erreur", "Impossible de charger les mouvements.");
 		}
 	}
+	@FXML
+	private void loadStocks() {
+	    try {
+	        List<Stock> stocks = stockDAO.getAllStocks();
+	        List<String> stockDisplayList = new ArrayList<>();
+
+	        for (Stock stock : stocks) {
+	            Produit produit = produitDAO.readProduitById(stock.getIdProduit());
+	            String produitNom = (produit != null) ? produit.getNom() : "Produit inconnu";
+	            String stockInfo = "Produit : " + produitNom + 
+	                               ", Quantité : " + stock.getQuantite();
+	            stockDisplayList.add(stockInfo);
+	        }
+
+	        stockListView.getItems().setAll(stockDisplayList);
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        showError("Erreur", "Impossible de charger les stocks.");
+	    }
+	}
+
+
 
 	@FXML
 	private void addProduit() {
@@ -106,7 +135,6 @@ public class GlobalController {
 
 	@FXML
 	private void addMouvementEntree() {
-	    // Vérification de l'initialisation des champs
 	    if (mouvementProduitField == null || mouvementProduitField.getText() == null || mouvementProduitField.getText().isEmpty()) {
 	        showError("Erreur", "Le champ Produit ID est vide.");
 	        return;
@@ -117,7 +145,6 @@ public class GlobalController {
 	    }
 
 	    try {
-	        // Récupérer les valeurs correctement
 	        int produitId = Integer.parseInt(mouvementProduitField.getText());
 	        int quantite = Integer.parseInt(mouvementQuantiteField.getText());
 
@@ -131,19 +158,11 @@ public class GlobalController {
 	            return;
 	        }
 
-	        // Affichage pour débogage
-	        System.out.println("Produit ID: " + produitId);
-	        System.out.println("Quantité: " + quantite);
-	        System.out.println("Rack ID: " + rackId);
-
-	        // Créer l'objet MouvementStock
 	        MouvementStock mouvement = new MouvementStock(0, produitId, "ENTREE", quantite, rackId, LocalDateTime.now()); 
 
-	        // Enregistrement du mouvement dans la base de données
 	        mouvementStockDAO.addMouvement(mouvement);
 
-	        // Rafraîchissement de la ListView des mouvements
-	        loadMouvements(); // Recharger les mouvements après ajout
+	        loadMouvements(); 
 	    } catch (NumberFormatException e) {
 	        showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
 	    } catch (SQLException e) {
@@ -156,7 +175,6 @@ public class GlobalController {
 
 	@FXML
 	private void addMouvementSortie() {
-		    // Vérification de l'initialisation des champs
 		    if (mouvementProduitField == null || mouvementProduitField.getText() == null || mouvementProduitField.getText().isEmpty()) {
 		        showError("Erreur", "Le champ Produit ID est vide.");
 		        return;
@@ -167,7 +185,6 @@ public class GlobalController {
 		    }
 
 		    try {
-		        // Récupérer les valeurs correctement
 		        int produitId = Integer.parseInt(mouvementProduitField.getText());
 		        int quantite = Integer.parseInt(mouvementQuantiteField.getText());
 
@@ -181,25 +198,48 @@ public class GlobalController {
 		            return;
 		        }
 
-		        // Affichage pour débogage
-		        System.out.println("Produit ID: " + produitId);
-		        System.out.println("Quantité: " + quantite);
-		        System.out.println("Rack ID: " + rackId);
-
-		        // Créer l'objet MouvementStock
 		        MouvementStock mouvement = new MouvementStock(0, produitId, "SORTIE", quantite, rackId, LocalDateTime.now()); 
 
-		        // Enregistrement du mouvement dans la base de données
 		        mouvementStockDAO.addMouvement(mouvement);
 
-		        // Rafraîchissement de la ListView des mouvements
-		        loadMouvements(); // Recharger les mouvements après ajout
+		        loadMouvements();
 		    } catch (NumberFormatException e) {
 		        showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
 		    } catch (SQLException e) {
 		        e.printStackTrace();
 		        showError("Erreur SQL", "Erreur lors de l'ajout du mouvement de sortie.");
 		    }
+	}
+	@FXML
+	private void updateStock() {
+	    if (mouvementProduitField == null || mouvementProduitField.getText().isEmpty()) {
+	        showError("Erreur", "Le champ Produit ID est vide.");
+	        return;
+	    }
+	    if (mouvementQuantiteField == null || mouvementQuantiteField.getText().isEmpty()) {
+	        showError("Erreur", "Le champ Quantité est vide.");
+	        return;
+	    }
+
+	    try {
+	        int produitId = Integer.parseInt(mouvementProduitField.getText());
+	        int quantite = Integer.parseInt(mouvementQuantiteField.getText());
+
+	        Stock stock = stockDAO.getStockByProduitId(produitId);
+	        if (stock == null) {
+	            showError("Erreur", "Le stock pour ce produit n'existe pas.");
+	            return;
+	        }
+	        stock.setQuantite(quantite);
+	        stockDAO.updateStock(stock);
+
+	        loadStocks(); 
+	    } catch (NumberFormatException e) {
+	        showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        showError("Erreur SQL", "Erreur lors de la mise à jour du stock.");
+	    }
 	}
 
 	private void showError(String title, String message) {

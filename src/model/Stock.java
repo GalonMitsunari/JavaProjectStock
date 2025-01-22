@@ -8,6 +8,16 @@ public class Stock {
 	private int idRack;
 	private int quantite;
 	private Timestamp dateAjout;
+	private String nomProduit = "toto";
+
+	public String getNomProduit() {
+	    return nomProduit;
+	}
+
+	public void setNomProduit(String nomProduit) {
+	    this.nomProduit = nomProduit;
+	}
+
 
 	public Stock(int id, int idProduit, int idRack, int quantite, Timestamp dateAjout) {
 		this.id = id;

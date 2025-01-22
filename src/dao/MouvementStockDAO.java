@@ -56,7 +56,6 @@ public class MouvementStockDAO {
 		            }
 		            pstmt.executeUpdate();
 
-		            // Vérification de l'existence du stock pour ce produit et rack
 		            String checkStockQuery = "SELECT quantite FROM Stock WHERE id_produit = ? AND id_rack = ?";
 		            try (PreparedStatement pstmtCheckStock = conn.prepareStatement(checkStockQuery)) {
 		                pstmtCheckStock.setInt(1, mouvement.getIdProduit());
