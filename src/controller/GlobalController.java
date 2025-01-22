@@ -163,6 +163,7 @@ public class GlobalController {
 	        mouvementStockDAO.addMouvement(mouvement);
 
 	        loadMouvements(); 
+	        loadStocks();
 	    } catch (NumberFormatException e) {
 	        showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
 	    } catch (SQLException e) {
@@ -203,6 +204,7 @@ public class GlobalController {
 		        mouvementStockDAO.addMouvement(mouvement);
 
 		        loadMouvements();
+		        loadStocks();
 		    } catch (NumberFormatException e) {
 		        showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
 		    } catch (SQLException e) {
