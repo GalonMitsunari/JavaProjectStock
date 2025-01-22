@@ -12,6 +12,7 @@
     </padding>
 
     <Label text="Menu Principal" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    <Button text="Gestion Globale" onAction="#goToGlobalView" />
     <Button text="Gérer les Produits" onAction="#goToProduitView" />
     <Button text="Gérer les Racks" onAction="#goToRackView" />
     <Button text="Gérer les Stocks" onAction="#goToStockView" />

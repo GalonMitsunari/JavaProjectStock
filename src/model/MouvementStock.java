@@ -7,8 +7,10 @@ public class MouvementStock {
 	private int idProduit;
 	private String typeMouvement;
 	private int quantite;
-	private Integer idRack; 
+	private Integer idRack;
 	private LocalDateTime dateMouvement;
+	private Produit produit;
+	private Rack rack;
 
 	public MouvementStock(int id, int idProduit, String typeMouvement, int quantite, Integer idRack,
 			LocalDateTime dateMouvement) {
@@ -18,6 +20,7 @@ public class MouvementStock {
 		this.quantite = quantite;
 		this.idRack = idRack;
 		this.dateMouvement = dateMouvement;
+		//this.produit = produit;  // Initialisation de produit
 	}
 
 	public int getId() {
@@ -67,4 +70,14 @@ public class MouvementStock {
 	public void setDateMouvement(LocalDateTime dateMouvement) {
 		this.dateMouvement = dateMouvement;
 	}
+	@Override
+	public String toString() {
+		String produitNom = (produit != null) ? produit.getNom() : "Nom non disponible";
+		
+	    return "Produit: " + (idProduit) + " : "  + produitNom +
+	           ", Quantité: " + (quantite) +
+	           ", Rack ID: " + (idRack);
+	}
+
+
 }

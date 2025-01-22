@@ -5,6 +5,10 @@ import javafx.fxml.FXML;
 
 public class MenuController {
 	@FXML
+	public void goToGlobalView() {
+		Main.changeScene("GlobalView.fxml");
+	}
+	@FXML
 	public void goToProduitView() {
 		Main.changeScene("ProduitView.fxml");
 	}

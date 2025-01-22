@@ -54,4 +54,9 @@ public class Rack {
 	public void setEmplacement(String emplacement) {
 		this.emplacement = emplacement;
 	}
+	@Override
+	public String toString() {
+	    return "Rack " + reference + " - " + description + " [Capacité max : " + capaciteMax + ", Emplacement : " + emplacement + "]";
+	}
+
 }

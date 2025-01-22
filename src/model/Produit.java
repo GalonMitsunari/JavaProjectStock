@@ -43,4 +43,9 @@ public class Produit {
 	public LocalDateTime getDateCreation() {
 		return dateCreation;
 	}
+	@Override
+	public String toString() {
+	    return id + " : " + nom + " (" + categorie + ")";
+	}
+
 }

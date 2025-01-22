@@ -58,4 +58,6 @@ public class StockDAO {
 			pstmt.executeUpdate();
 		}
 	}
+
+
 }
