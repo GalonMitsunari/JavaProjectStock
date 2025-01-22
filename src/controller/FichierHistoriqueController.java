@@ -15,67 +15,68 @@ import Application.Main;
 
 public class FichierHistoriqueController {
 
-    @FXML
-    private ListView<String> fichierListView;
-    @FXML
-    private TextField fichierNomField;
-    @FXML
-    private ChoiceBox<String> statusChoiceBox;
-    @FXML
-    private TextArea erreursArea;
+	@FXML
+	private ListView<String> fichierListView;
+	@FXML
+	private TextField fichierNomField;
+	@FXML
+	private ChoiceBox<String> statusChoiceBox;
+	@FXML
+	private TextArea erreursArea;
 
-    private FichierHistoriqueDAO fichierHistoriqueDAO = new FichierHistoriqueDAO();
+	private FichierHistoriqueDAO fichierHistoriqueDAO = new FichierHistoriqueDAO();
 
-    @FXML
-    public void initialize() {
-        statusChoiceBox.getItems().addAll("SUCCES", "ERREUR");
-        loadFichiers();
-    }
-    // Méthode pour retourner au menu principal
-    @FXML
-    private void goToMenu() {
-        Main.changeScene("MenuView.fxml");
-    }
+	@FXML
+	public void initialize() {
+		statusChoiceBox.getItems().addAll("SUCCES", "ERREUR");
+		loadFichiers();
+	}
 
-    private void loadFichiers() {
-        try {
-            fichierListView.getItems().clear();
-            for (FichierHistorique fichier : fichierHistoriqueDAO.getAllFichiers()) {
-                fichierListView.getItems().add(
-                        fichier.getNomFichier() + " (" + fichier.getStatus() + ") - " + fichier.getDateImport()
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+	@FXML
+	private void goToMenu() {
+		Main.changeScene("MenuView.fxml");
+	}
 
-    @FXML
-    private void addFichier() {
-        try {
-            String nomFichier = fichierNomField.getText();
-            String status = statusChoiceBox.getValue();
-            String erreurs = erreursArea.getText();
+	private void loadFichiers() {
+		try {
+			fichierListView.getItems().clear();
+			for (FichierHistorique fichier : fichierHistoriqueDAO.getAllFichiers()) {
+				fichierListView.getItems().add(fichier.getNomFichier() + " ("
+						+ fichier.getStatus() + ") - " + fichier.getDateImport());
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-            FichierHistorique fichier = new FichierHistorique(0, nomFichier, LocalDateTime.now(), status, erreurs);
-            fichierHistoriqueDAO.addFichier(fichier);
-            loadFichiers();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+	@FXML
+	private void addFichier() {
+		try {
+			String nomFichier = fichierNomField.getText();
+			String status = statusChoiceBox.getValue();
+			String erreurs = erreursArea.getText();
 
-    @FXML
-    private void deleteFichier() {
-        try {
-            String selectedItem = fichierListView.getSelectionModel().getSelectedItem();
-            if (selectedItem != null) {
-                int id = Integer.parseInt(selectedItem.split(" ")[0]); // Assuming ID is the first word
-                fichierHistoriqueDAO.deleteFichierById(id);
-                loadFichiers();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+			FichierHistorique fichier = new FichierHistorique(0, nomFichier, LocalDateTime.now(),
+					status, erreurs);
+			fichierHistoriqueDAO.addFichier(fichier);
+			loadFichiers();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@FXML
+	private void deleteFichier() {
+		try {
+			String selectedItem = fichierListView.getSelectionModel().getSelectedItem();
+			if (selectedItem != null) {
+				int id = Integer.parseInt(selectedItem.split(" ")[0]); // Assuming ID is the
+										// first word
+				fichierHistoriqueDAO.deleteFichierById(id);
+				loadFichiers();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

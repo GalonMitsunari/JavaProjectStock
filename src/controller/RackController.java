@@ -13,126 +13,122 @@ import java.sql.SQLException;
 import Application.Main;
 
 public class RackController {
-    @FXML
-    private ListView<String> rackListView;
-    @FXML
-    private TextField rackReferenceField;
-    @FXML
-    private TextField rackCapaciteMaxField;
-    @FXML
-    private TextField rackDescriptionField;
-    @FXML
-    private TextField rackEmplacementField;
+	@FXML
+	private ListView<String> rackListView;
+	@FXML
+	private TextField rackReferenceField;
+	@FXML
+	private TextField rackCapaciteMaxField;
+	@FXML
+	private TextField rackDescriptionField;
+	@FXML
+	private TextField rackEmplacementField;
 
-    private RackDAO rackDAO = new RackDAO();
+	private RackDAO rackDAO = new RackDAO();
 
-    @FXML
-    public void initialize() {
-        loadRacks();
-    }
-    // Méthode pour retourner au menu principal
-    @FXML
-    private void goToMenu() {
-        Main.changeScene("MenuView.fxml");
-    }
-    private void loadRacks() {
-        try {
-            rackListView.getItems().clear();
-            for (Rack rack : rackDAO.getAllRacks()) {
-                rackListView.getItems().add(rack.getId() + " : " + rack.getReference() + " - " + rack.getCapaciteMax() + " - " + rack.getDescription() + " - " + rack.getEmplacement());
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+	@FXML
+	public void initialize() {
+		loadRacks();
+	}
 
-    @FXML
-    private void addRack() {
-        try {
-            Rack rack = new Rack(
-                    0,
-                    rackReferenceField.getText(),
-                    Integer.parseInt(rackCapaciteMaxField.getText()),
-                    rackDescriptionField.getText(),
-                    rackEmplacementField.getText()
-            );
-            rackDAO.addRack(rack);
-            loadRacks();
-        } catch (SQLException | NumberFormatException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    @FXML
-    private void updateRack() {
-        try {
-            String reference = rackReferenceField.getText();
-            if (reference.isEmpty()) {
-                showError("Erreur", "Veuillez saisir une référence pour identifier le rack.");
-                return;
-            }
+	// Méthode pour retourner au menu principal
+	@FXML
+	private void goToMenu() {
+		Main.changeScene("MenuView.fxml");
+	}
 
-            Rack rack = rackDAO.getRackByReference(reference);
-            if (rack == null) {
-                showError("Erreur", "Aucun rack trouvé avec la référence saisie.");
-                return;
-            }
+	private void loadRacks() {
+		try {
+			rackListView.getItems().clear();
+			for (Rack rack : rackDAO.getAllRacks()) {
+				rackListView.getItems().add(rack.getId() + " : " + rack.getReference() + " - "
+						+ rack.getCapaciteMax() + " - " + rack.getDescription()
+						+ " - " + rack.getEmplacement());
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-            rack.setCapaciteMax(Integer.parseInt(rackCapaciteMaxField.getText()));
-            rack.setDescription(rackDescriptionField.getText());
-            rack.setEmplacement(rackEmplacementField.getText());
+	@FXML
+	private void addRack() {
+		try {
+			Rack rack = new Rack(0, rackReferenceField.getText(),
+					Integer.parseInt(rackCapaciteMaxField.getText()),
+					rackDescriptionField.getText(), rackEmplacementField.getText());
+			rackDAO.addRack(rack);
+			loadRacks();
+		} catch (SQLException | NumberFormatException e) {
+			e.printStackTrace();
+		}
+	}
 
-            rackDAO.updateRack(rack);
+	@FXML
+	private void updateRack() {
+		try {
+			String reference = rackReferenceField.getText();
+			if (reference.isEmpty()) {
+				showError("Erreur", "Veuillez saisir une référence pour identifier le rack.");
+				return;
+			}
 
-            loadRacks();
-            clearFields();
-        } catch (SQLException | NumberFormatException e) {
-            e.printStackTrace();
-            showError("Erreur", "Impossible de mettre à jour le rack.");
-        }
-    }
+			Rack rack = rackDAO.getRackByReference(reference);
+			if (rack == null) {
+				showError("Erreur", "Aucun rack trouvé avec la référence saisie.");
+				return;
+			}
 
+			rack.setCapaciteMax(Integer.parseInt(rackCapaciteMaxField.getText()));
+			rack.setDescription(rackDescriptionField.getText());
+			rack.setEmplacement(rackEmplacementField.getText());
 
+			rackDAO.updateRack(rack);
 
-    @FXML
-    private void deleteRack() {
-        try {
-            if (rackReferenceField.getText().isEmpty()) {
-                showError("Erreur", "Veuillez saisir une référence de rack valide.");
-                return;
-            }
+			loadRacks();
+			clearFields();
+		} catch (SQLException | NumberFormatException e) {
+			e.printStackTrace();
+			showError("Erreur", "Impossible de mettre à jour le rack.");
+		}
+	}
 
-            int id;
-            try {
-                id = Integer.parseInt(rackReferenceField.getText());
-            } catch (NumberFormatException e) {
-                showError("Erreur", "La référence du rack doit être un numéro valide.");
-                return;
-            }
+	@FXML
+	private void deleteRack() {
+		try {
+			if (rackReferenceField.getText().isEmpty()) {
+				showError("Erreur", "Veuillez saisir une référence de rack valide.");
+				return;
+			}
 
-            rackDAO.deleteRackById(id);
+			int id;
+			try {
+				id = Integer.parseInt(rackReferenceField.getText());
+			} catch (NumberFormatException e) {
+				showError("Erreur", "La référence du rack doit être un numéro valide.");
+				return;
+			}
 
-            loadRacks();
-            clearFields();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showError("Erreur", "Impossible de supprimer le rack.");
-        }
-    }
+			rackDAO.deleteRackById(id);
 
+			loadRacks();
+			clearFields();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			showError("Erreur", "Impossible de supprimer le rack.");
+		}
+	}
 
+	private void clearFields() {
+		rackReferenceField.clear();
+		rackCapaciteMaxField.clear();
+		rackDescriptionField.clear();
+		rackEmplacementField.clear();
+	}
 
-    private void clearFields() {
-        rackReferenceField.clear();
-        rackCapaciteMaxField.clear();
-        rackDescriptionField.clear();
-        rackEmplacementField.clear();
-    }
-
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
+	private void showError(String title, String message) {
+		Alert alert = new Alert(Alert.AlertType.ERROR);
+		alert.setTitle(title);
+		alert.setContentText(message);
+		alert.showAndWait();
+	}
 }
