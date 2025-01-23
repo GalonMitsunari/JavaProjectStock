@@ -7,6 +7,8 @@ import javafx.scene.control.*;
 import model.Produit;
 import model.Rack;
 import model.Stock;
+import service.FTPService;
+import model.FichierHistorique;
 import model.MouvementStock;
 
 import java.sql.SQLException;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import dao.ImportCSVDAO;
 import dao.MouvementStockDAO;
 import dao.ProduitDAO;
 import dao.RackDAO;
@@ -243,6 +246,39 @@ public class GlobalController {
 	        showError("Erreur SQL", "Erreur lors de la mise à jour du stock.");
 	    }
 	}
+	
+	@FXML
+	private void handleFTPImport() {
+	    FTPService ftpService = new FTPService();
+	    ImportCSVDAO importCSVDAO = new ImportCSVDAO();
+
+	    String remoteFile = "/CCI/Stock.csv";
+	    String localFile = "C:/Users/Eleve/Downloads/Stock.csv"; 
+
+	    String downloadResult = ftpService.downloadCSV(remoteFile, localFile);
+	    if (!downloadResult.contains("succès")) {
+	        showError("Erreur FTP", "Impossible de télécharger le fichier.");
+	        return;
+	    }
+
+	    boolean importSuccess = importCSVDAO.importCSVToDatabase(localFile);
+
+
+	    if (importSuccess) {
+	        showInfo("Succès", "Le fichier a été importé avec succès dans la base de données.");
+	        loadStocks();
+	    } else {
+	        showError("Erreur", "L'importation du fichier dans la base de données a échoué.");
+	    }
+	}
+
+	private void showInfo(String title, String message) {
+	    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+	    alert.setTitle(title);
+	    alert.setContentText(message);
+	    alert.showAndWait();
+	}
+
 
 	private void showError(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);

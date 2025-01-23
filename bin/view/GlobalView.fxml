@@ -51,6 +51,10 @@
             <TextField fx:id="produitColumn" promptText="Produit" />
             <TextField fx:id="quantiteColumn" promptText="Quantité Disponible" />
         </HBox>
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Importer CSV depuis FTP" onAction="#handleFTPImport" />
+        </HBox>
+        
     </VBox>
 </Tab>
 
