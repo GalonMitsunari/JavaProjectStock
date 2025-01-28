@@ -9,6 +9,7 @@ import model.Rack;
 import model.Stock;
 import service.FTPService;
 import utils.CSVGenerator;
+import utils.CSVReaderUtil;
 import model.FichierHistorique;
 import model.MouvementStock;
 
@@ -18,6 +19,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 
 import dao.ImportCSVDAO;
 import dao.MouvementStockDAO;
@@ -49,7 +51,7 @@ public class GlobalController {
 	@FXML
 	private ListView<String> stockListView;
 	private TextField produitColumn, quantiteColumn;
-
+	private List<String[]> manquantsPourAchat = new ArrayList<>();
 
 	private final ProduitDAO produitDAO = new ProduitDAO();
 	private final RackDAO rackDAO = new RackDAO();
@@ -87,29 +89,28 @@ public class GlobalController {
 			showError("Erreur", "Impossible de charger les mouvements.");
 		}
 	}
+
 	@FXML
 	private void loadStocks() {
-	    try {
-	        List<Stock> stocks = stockDAO.getAllStocks();
-	        List<String> stockDisplayList = new ArrayList<>();
+		try {
+			List<Stock> stocks = stockDAO.getAllStocks();
+			List<String> stockDisplayList = new ArrayList<>();
 
-	        for (Stock stock : stocks) {
-	            Produit produit = produitDAO.readProduitById(stock.getIdProduit());
-	            String produitNom = (produit != null) ? produit.getNom() : "Produit inconnu";
-	            String stockInfo = "Produit : " + produitNom + 
-	                               ", Quantité : " + stock.getQuantite();
-	            stockDisplayList.add(stockInfo);
-	        }
+			for (Stock stock : stocks) {
+				Produit produit = produitDAO.readProduitById(stock.getIdProduit());
+				String produitNom = (produit != null) ? produit.getNom() : "Produit inconnu";
+				String stockInfo = "Produit : " + produitNom + ", Quantité : "
+						+ stock.getQuantite();
+				stockDisplayList.add(stockInfo);
+			}
 
-	        stockListView.getItems().setAll(stockDisplayList);
+			stockListView.getItems().setAll(stockDisplayList);
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        showError("Erreur", "Impossible de charger les stocks.");
-	    }
+		} catch (SQLException e) {
+			e.printStackTrace();
+			showError("Erreur", "Impossible de charger les stocks.");
+		}
 	}
-
-
 
 	@FXML
 	private void addProduit() {
@@ -140,147 +141,152 @@ public class GlobalController {
 
 	@FXML
 	private void addMouvementEntree() {
-	    if (mouvementProduitField == null || mouvementProduitField.getText() == null || mouvementProduitField.getText().isEmpty()) {
-	        showError("Erreur", "Le champ Produit ID est vide.");
-	        return;
-	    }
-	    if (mouvementQuantiteField == null || mouvementQuantiteField.getText() == null || mouvementQuantiteField.getText().isEmpty()) {
-	        showError("Erreur", "Le champ Quantité est vide.");
-	        return;
-	    }
+		if (mouvementProduitField == null || mouvementProduitField.getText() == null
+				|| mouvementProduitField.getText().isEmpty()) {
+			showError("Erreur", "Le champ Produit ID est vide.");
+			return;
+		}
+		if (mouvementQuantiteField == null || mouvementQuantiteField.getText() == null
+				|| mouvementQuantiteField.getText().isEmpty()) {
+			showError("Erreur", "Le champ Quantité est vide.");
+			return;
+		}
 
-	    try {
-	        int produitId = Integer.parseInt(mouvementProduitField.getText());
-	        int quantite = Integer.parseInt(mouvementQuantiteField.getText());
+		try {
+			int produitId = Integer.parseInt(mouvementProduitField.getText());
+			int quantite = Integer.parseInt(mouvementQuantiteField.getText());
 
-	        Integer rackId = null;
-	        if (mouvementRackField != null && mouvementRackField.getText() != null && !mouvementRackField.getText().isEmpty()) {
-	            rackId = Integer.parseInt(mouvementRackField.getText());
-	        }
+			Integer rackId = null;
+			if (mouvementRackField != null && mouvementRackField.getText() != null
+					&& !mouvementRackField.getText().isEmpty()) {
+				rackId = Integer.parseInt(mouvementRackField.getText());
+			}
 
-	        if (produitId <= 0 || quantite <= 0) {
-	            showError("Erreur", "Produit ID ou quantité invalide.");
-	            return;
-	        }
+			if (produitId <= 0 || quantite <= 0) {
+				showError("Erreur", "Produit ID ou quantité invalide.");
+				return;
+			}
 
-	        MouvementStock mouvement = new MouvementStock(0, produitId, "ENTREE", quantite, rackId, LocalDateTime.now()); 
+			MouvementStock mouvement = new MouvementStock(0, produitId, "ENTREE", quantite, rackId,
+					LocalDateTime.now());
 
-	        mouvementStockDAO.addMouvement(mouvement);
+			mouvementStockDAO.addMouvement(mouvement);
 
-	        loadMouvements(); 
-	        loadStocks();
-	    } catch (NumberFormatException e) {
-	        showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        showError("Erreur SQL", "Erreur lors de l'ajout du mouvement d'entrée.");
-	    }
+			loadMouvements();
+			loadStocks();
+		} catch (NumberFormatException e) {
+			showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			showError("Erreur SQL", "Erreur lors de l'ajout du mouvement d'entrée.");
+		}
 	}
-
-
 
 	@FXML
 	private void addMouvementSortie() {
-		    if (mouvementProduitField == null || mouvementProduitField.getText() == null || mouvementProduitField.getText().isEmpty()) {
-		        showError("Erreur", "Le champ Produit ID est vide.");
-		        return;
-		    }
-		    if (mouvementQuantiteField == null || mouvementQuantiteField.getText() == null || mouvementQuantiteField.getText().isEmpty()) {
-		        showError("Erreur", "Le champ Quantité est vide.");
-		        return;
-		    }
+		if (mouvementProduitField == null || mouvementProduitField.getText() == null
+				|| mouvementProduitField.getText().isEmpty()) {
+			showError("Erreur", "Le champ Produit ID est vide.");
+			return;
+		}
+		if (mouvementQuantiteField == null || mouvementQuantiteField.getText() == null
+				|| mouvementQuantiteField.getText().isEmpty()) {
+			showError("Erreur", "Le champ Quantité est vide.");
+			return;
+		}
 
-		    try {
-		        int produitId = Integer.parseInt(mouvementProduitField.getText());
-		        int quantite = Integer.parseInt(mouvementQuantiteField.getText());
+		try {
+			int produitId = Integer.parseInt(mouvementProduitField.getText());
+			int quantite = Integer.parseInt(mouvementQuantiteField.getText());
 
-		        Integer rackId = null;
-		        if (mouvementRackField != null && mouvementRackField.getText() != null && !mouvementRackField.getText().isEmpty()) {
-		            rackId = Integer.parseInt(mouvementRackField.getText());
-		        }
+			Integer rackId = null;
+			if (mouvementRackField != null && mouvementRackField.getText() != null
+					&& !mouvementRackField.getText().isEmpty()) {
+				rackId = Integer.parseInt(mouvementRackField.getText());
+			}
 
-		        if (produitId <= 0 || quantite <= 0) {
-		            showError("Erreur", "Produit ID ou quantité invalide.");
-		            return;
-		        }
+			if (produitId <= 0 || quantite <= 0) {
+				showError("Erreur", "Produit ID ou quantité invalide.");
+				return;
+			}
 
-		        MouvementStock mouvement = new MouvementStock(0, produitId, "SORTIE", quantite, rackId, LocalDateTime.now()); 
+			MouvementStock mouvement = new MouvementStock(0, produitId, "SORTIE", quantite, rackId,
+					LocalDateTime.now());
 
-		        mouvementStockDAO.addMouvement(mouvement);
+			mouvementStockDAO.addMouvement(mouvement);
 
-		        loadMouvements();
-		        loadStocks();
-		    } catch (NumberFormatException e) {
-		        showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
-		    } catch (SQLException e) {
-		        e.printStackTrace();
-		        showError("Erreur SQL", "Erreur lors de l'ajout du mouvement de sortie.");
-		    }
+			loadMouvements();
+			loadStocks();
+		} catch (NumberFormatException e) {
+			showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			showError("Erreur SQL", "Erreur lors de l'ajout du mouvement de sortie.");
+		}
 	}
+
 	@FXML
 	private void updateStock() {
-	    if (mouvementProduitField == null || mouvementProduitField.getText().isEmpty()) {
-	        showError("Erreur", "Le champ Produit ID est vide.");
-	        return;
-	    }
-	    if (mouvementQuantiteField == null || mouvementQuantiteField.getText().isEmpty()) {
-	        showError("Erreur", "Le champ Quantité est vide.");
-	        return;
-	    }
+		if (mouvementProduitField == null || mouvementProduitField.getText().isEmpty()) {
+			showError("Erreur", "Le champ Produit ID est vide.");
+			return;
+		}
+		if (mouvementQuantiteField == null || mouvementQuantiteField.getText().isEmpty()) {
+			showError("Erreur", "Le champ Quantité est vide.");
+			return;
+		}
 
-	    try {
-	        int produitId = Integer.parseInt(mouvementProduitField.getText());
-	        int quantite = Integer.parseInt(mouvementQuantiteField.getText());
+		try {
+			int produitId = Integer.parseInt(mouvementProduitField.getText());
+			int quantite = Integer.parseInt(mouvementQuantiteField.getText());
 
-	        Stock stock = stockDAO.getStockByProduitId(produitId);
-	        if (stock == null) {
-	            showError("Erreur", "Le stock pour ce produit n'existe pas.");
-	            return;
-	        }
-	        stock.setQuantite(quantite);
-	        stockDAO.updateStock(stock);
+			Stock stock = stockDAO.getStockByProduitId(produitId);
+			if (stock == null) {
+				showError("Erreur", "Le stock pour ce produit n'existe pas.");
+				return;
+			}
+			stock.setQuantite(quantite);
+			stockDAO.updateStock(stock);
 
-	        loadStocks(); 
-	    } catch (NumberFormatException e) {
-	        showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        showError("Erreur SQL", "Erreur lors de la mise à jour du stock.");
-	    }
+			loadStocks();
+		} catch (NumberFormatException e) {
+			showError("Erreur", "Veuillez entrer des valeurs numériques valides.");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			showError("Erreur SQL", "Erreur lors de la mise à jour du stock.");
+		}
 	}
-	
+
 	@FXML
 	private void handleFTPImport() {
-	    FTPService ftpService = new FTPService();
-	    ImportCSVDAO importCSVDAO = new ImportCSVDAO();
+		FTPService ftpService = new FTPService();
+		ImportCSVDAO importCSVDAO = new ImportCSVDAO();
 
-	    String remoteFile = "/CCI/Stock.csv";
-	    String localFile = "C:/Users/Eleve/Downloads/Stock.csv"; 
+		String remoteFile = "/CCI/Stock.csv";
+		String localFile = "C:/Users/Eleve/Downloads/Stock.csv";
 
-	    String downloadResult = ftpService.downloadCSV(remoteFile, localFile);
-	    if (!downloadResult.contains("succès")) {
-	        showError("Erreur FTP", "Impossible de télécharger le fichier.");
-	        return;
-	    }
+		String downloadResult = ftpService.downloadCSV(remoteFile, localFile);
+		if (!downloadResult.contains("succès")) {
+			showError("Erreur FTP", "Impossible de télécharger le fichier.");
+			return;
+		}
 
-	    boolean importSuccess = importCSVDAO.importCSVToDatabase(localFile);
+		boolean importSuccess = importCSVDAO.importCSVToDatabase(localFile);
 
-
-	    if (importSuccess) {
-	        showInfo("Succès", "Le fichier a été importé avec succès dans la base de données.");
-	        loadStocks();
-	    } else {
-	        showError("Erreur", "L'importation du fichier dans la base de données a échoué.");
-	    }
+		if (importSuccess) {
+			showInfo("Succès", "Le fichier a été importé avec succès dans la base de données.");
+			loadStocks();
+		} else {
+			showError("Erreur", "L'importation du fichier dans la base de données a échoué.");
+		}
 	}
 
 	private void showInfo(String title, String message) {
-	    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-	    alert.setTitle(title);
-	    alert.setContentText(message);
-	    alert.showAndWait();
+		Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		alert.setTitle(title);
+		alert.setContentText(message);
+		alert.showAndWait();
 	}
-
 
 	private void showError(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -288,99 +294,124 @@ public class GlobalController {
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
+
 	@FXML
-	private void generateMissingStocksCSV() {
-	    try {
-	        List<Produit> produitsManquants = produitDAO.getMissingStocks();
-
-	        if (produitsManquants == null || produitsManquants.isEmpty()) {
-	            showInfo("Aucun stock manquant", "Tous les produits ont un stock suffisant.");
-	            return;
-	        }
-	        List<String[]> data = new ArrayList<>();
-	        for (Produit produit : produitsManquants) {
-	            String[] row = {
-	                String.valueOf(produit.getId()),        
-	                String.valueOf(produit.getQuantiteMin())
-	            };
-	            data.add(row);
-	        }
-
-	        String filePath = "C:/Users/Eleve/Downloads/stocks_manquants.csv";
-	        String[] header = {"id_produit", "quantite_min"}; //
-
-	        CSVGenerator.generateCSV(filePath, data, header);
-
-	        showInfo("Fichier généré", "Le fichier des stocks manquants a été généré avec succès :\n" + filePath);
-
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	        showError("Erreur IO", "Une erreur est survenue lors de la génération du fichier CSV.");
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        showError("Erreur SQL", "Impossible de récupérer les stocks manquants depuis la base de données.");
-	    }
-	}
-	@FXML
-	private void exportMissingStocksForAchat() {
-	    try {
-	        List<Produit> produitsManquants = produitDAO.getMissingStocks();
-
-	        if (produitsManquants == null || produitsManquants.isEmpty()) {
-	            showInfo("Aucun stock manquant", "Tous les produits ont un stock suffisant.");
-	            return;
-	        }
-
-	        List<String[]> data = new ArrayList<>();
-	        for (Produit produit : produitsManquants) {
-	            String[] row = {
-	                String.valueOf(produit.getId()),                               
-	                String.valueOf(produit.getQuantiteMin()) 
-	            };
-	            data.add(row);
-	        }
-
-	        String filePath = "C:/Users/Eleve/Downloads/achat_stocks_manquants.csv";
-	        String[] header = {"id_produit", "quantite_min"};
-
-	        CSVGenerator.generateCSV(filePath, data, header);
-
-	        showInfo("Fichier généré", "Le fichier des stocks manquants à envoyer à Achat a été généré :\n" + filePath);
-
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	        showError("Erreur IO", "Une erreur est survenue lors de la génération du fichier CSV.");
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        showError("Erreur SQL", "Impossible de récupérer les stocks manquants depuis la base de données.");
-	    }
-	}
-	@FXML
-	private void importStocksFromAchat() {
+	private void importFabNeeds() {
 	    FTPService ftpService = new FTPService();
-	    ImportCSVDAO importCSVDAO = new ImportCSVDAO();
+	    String remoteFile = "/Fab/Besoins.csv";
+	    String localFile = "C:/Users/Eleve/Downloads/Besoins.csv";
 
-	
-	    String remoteFile = "/Achat/StocksRecus.csv";
-	    String localFile = "C:/Users/Eleve/Downloads/StocksRecus.csv";
-
-	   
 	    String downloadResult = ftpService.downloadCSV(remoteFile, localFile);
 	    if (!downloadResult.contains("succès")) {
-	        showError("Erreur FTP", "Impossible de télécharger le fichier depuis Achat.");
+	        showError("Erreur FTP", "Impossible de télécharger les besoins de Fab.");
 	        return;
 	    }
 
-	   
-	    boolean importSuccess = importCSVDAO.importCSVToDatabase(localFile);
+	    try {
+	        List<String[]> besoinsFab = CSVReaderUtil.readCSV(localFile);
 
-	    if (importSuccess) {
-	        showInfo("Succès", "Les stocks reçus d'Achat ont été importés avec succès.");
-	        loadStocks(); 
-	    } else {
-	        showError("Erreur", "L'importation des stocks reçus d'Achat a échoué.");
+	        manquantsPourAchat.clear(); 
+
+	        for (String[] besoin : besoinsFab) {
+	            int idProduit = Integer.parseInt(besoin[0]);
+	            int quantiteDemandee = Integer.parseInt(besoin[1]);
+
+	            Stock stock = stockDAO.getStockByProduitId(idProduit);
+
+	            if (stock == null || stock.getQuantite() < quantiteDemandee) {
+	                int quantiteManquante = quantiteDemandee - (stock != null ? stock.getQuantite() : 0);
+	                manquantsPourAchat.add(new String[]{String.valueOf(idProduit), String.valueOf(quantiteManquante)});
+	            }
+	        }
+
+	        if (manquantsPourAchat.isEmpty()) {
+	            showInfo("Stocks suffisants", "Tous les besoins de Fab sont couverts.");
+	            generateConfirmationForFab();
+	        } else {
+	            exportMissingStocksForAchat();
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        showError("Erreur", "Erreur lors de l'importation des besoins de Fab.");
 	    }
 	}
 
+	    @FXML
+	    private void exportMissingStocksForAchat() {
+	        try {
+	            String filePath = "C:/Users/Eleve/Downloads/stocks_manquants_achat.csv";
+	            String[] header = {"id_produit", "quantite_manquante"};
+	            CSVGenerator.generateCSV(filePath, manquantsPourAchat, header);
 
-}
+	            showInfo("Fichier généré", "Le fichier des stocks manquants à envoyer à Achat a été généré :\n" + filePath);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            showError("Erreur IO", "Erreur lors de la génération du fichier CSV pour Achat.");
+	        }
+	    }
+
+
+	    @FXML
+	    private void importStocksFromAchat() {
+	        FTPService ftpService = new FTPService();
+	        String remoteFile = "/Achat/StocksRecus.csv";
+	        String localFile = "C:/Users/Eleve/Downloads/StocksRecus.csv";
+
+	        String downloadResult = ftpService.downloadCSV(remoteFile, localFile);
+	        if (!downloadResult.contains("succès")) {
+	            showError("Erreur FTP", "Impossible de télécharger les stocks reçus d'Achat.");
+	            return;
+	        }
+
+	        try {
+	            List<String[]> stocksRecus = CSVReaderUtil.readCSV(localFile); 
+
+	            for (String[] stockRecu : stocksRecus) {
+	                int idProduit = Integer.parseInt(stockRecu[0]);
+	                int quantiteAjoutee = Integer.parseInt(stockRecu[1]);
+
+	                Stock stock = stockDAO.getStockByProduitId(idProduit);
+	                if (stock != null) {
+	                    stock.setQuantite(stock.getQuantite() + quantiteAjoutee);
+	                    stockDAO.updateStock(stock);
+	                } else {
+	                    Stock newStock = new Stock(idProduit, 1, quantiteAjoutee);
+	                    stockDAO.addStock(newStock);
+	                }
+	            }
+
+	            showInfo("Importation réussie", "Les stocks reçus d'Achat ont été importés avec succès.");
+	            loadStocks();
+	            generateConfirmationForFab();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            showError("Erreur", "Erreur lors de l'importation des stocks reçus d'Achat.");
+	        }
+	    }
+
+	    @FXML
+	    private void generateConfirmationForFab() {
+	        try {
+	            List<String[]> stocksRecus = getStocksRecus();
+
+	            String filePath = "C:/Users/Eleve/Downloads/confirmation_fab.csv";
+	            String[] header = {"id_produit", "quantite_recue"};
+	            CSVGenerator.generateCSV(filePath, stocksRecus, header);
+
+	            showInfo("Fichier généré", "La confirmation pour Fab a été générée :\n" + filePath);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            showError("Erreur IO", "Erreur lors de la génération du fichier de confirmation pour Fab.");
+	        }
+	    }
+
+	    private List<String[]> getStocksRecus() {
+	        List<String[]> stocksRecus = new ArrayList<>();
+	        stocksRecus.add(new String[]{"1", "100"});
+	        stocksRecus.add(new String[]{"2", "150"});
+	        return stocksRecus;
+	    }
+
+
+
+	}

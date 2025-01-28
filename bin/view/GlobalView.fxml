@@ -54,12 +54,12 @@
         </VBox>
     </Tab>
 
-    <Tab text="Export Stocks Manquants">
-        <VBox alignment="CENTER" spacing="10">
-            <Label style="-fx-font-size: 16px;" text="Exporter les Stocks Manquants pour Achat" />
-            <Button onAction="#exportMissingStocksForAchat" text="Exporter les stocks manquants" />
-        </VBox>
-    </Tab>
+<Tab text="Export Stocks Manquants">
+    <VBox alignment="CENTER" spacing="10">
+        <Label style="-fx-font-size: 16px;" text="Exporter les Stocks Manquants pour Achat" />
+        <Button onAction="#exportMissingStocksForAchat" text="Exporter les stocks manquants" />
+    </VBox>
+</Tab>
 
     <Tab text="Import Stocks Reçus">
         <VBox alignment="CENTER" spacing="10">
@@ -67,6 +67,28 @@
             <Button onAction="#importStocksFromAchat" text="Importer les stocks reçus" />
         </VBox>
     </Tab>
+<Tab text="Import des besoins de Fab">
+    <VBox alignment="CENTER" spacing="10">
+        <Label style="-fx-font-size: 16px;" text="Importer les besoins de Fab" />
+        <Button onAction="#importFabNeeds" text="Importer les besoins de Fab" />
+        <Label fx:id="importFabStatusLabel" text="Statut de l'import : Pas encore effectué" />
+    </VBox>
+</Tab>
+<Tab text="Import des stocks reçus">
+    <VBox alignment="CENTER" spacing="10">
+        <Label style="-fx-font-size: 16px;" text="Importer les Stocks Reçus d'Achat" />
+        <Button onAction="#importStocksFromAchat" text="Importer les stocks reçus" />
+        <Label fx:id="importStocksStatusLabel" text="Statut de l'import : Pas encore effectué" />
+    </VBox>
+</Tab>
+
+<Tab text="Générer confirmation pour Fab">
+    <VBox alignment="CENTER" spacing="10">
+        <Label style="-fx-font-size: 16px;" text="Générer la confirmation pour Fab" />
+        <Button onAction="#generateConfirmationForFab" text="Générer confirmation pour Fab" />
+        <Label fx:id="confirmationStatusLabel" text="Statut de la confirmation : Pas encore effectué" />
+    </VBox>
+</Tab>
 
     <Tab text="Mouvements de Stock">
         <VBox alignment="CENTER" spacing="10">

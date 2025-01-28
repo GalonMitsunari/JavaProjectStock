@@ -91,7 +91,7 @@ public class StockDAO {
 		        boolean isHeader = true;
 
 		        while ((line = br.readLine()) != null) {
-		            if (isHeader) { // Ignorer l'en-tête
+		            if (isHeader) { 
 		                isHeader = false;
 		                continue;
 		            }

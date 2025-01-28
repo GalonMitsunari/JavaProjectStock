@@ -7,36 +7,62 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ImportCSVDAO {
 
-    public boolean importCSVToDatabase(String csvFilePath) {
-        String insertQuery = "INSERT INTO Stock (id_produit, id_rack, quantite) VALUES (?, ?, ?)";
+	    public boolean importCSVToDatabase(String csvFilePath) {
+	        String line;
+	        String csvSplitBy = ",";
 
-        try (Connection conn = DatabaseConnection.connectToBDD();
-             BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+	        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath));
+	             Connection conn = DatabaseConnection.connectToBDD()) {
 
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                if (values.length != 3) {
-                    System.out.println("Ligne ignorée (mauvais format) : " + line);
-                    continue;
-                }
+	            String queryCheckExistence = "SELECT quantite FROM Stock WHERE id_produit = ? AND id_rack = ?";
+	            String queryUpdateStock = "UPDATE Stock SET quantite = quantite + ? WHERE id_produit = ? AND id_rack = ?";
+	            String queryInsertStock = "INSERT INTO Stock (id_produit, id_rack, quantite) VALUES (?, ?, ?)";
 
-                try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
-                    pstmt.setInt(1, Integer.parseInt(values[0])); 
-                    pstmt.setInt(2, Integer.parseInt(values[1])); 
-                    pstmt.setInt(3, Integer.parseInt(values[2])); 
-                    pstmt.executeUpdate();
-                }
-            }
-            System.out.println("Importation réussie !");
-            return true;
-        } catch (IOException | SQLException | NumberFormatException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-}
+	            while ((line = br.readLine()) != null) {
+	                String[] data = line.split(csvSplitBy);
+
+	                if (data.length < 3) {
+	                    System.out.println("Ligne ignorée : " + line);
+	                    continue;
+	                }
+
+	                int idProduit = Integer.parseInt(data[0]);
+	                int idRack = Integer.parseInt(data[1]);
+	                int quantite = Integer.parseInt(data[2]);
+
+	                try (PreparedStatement checkStmt = conn.prepareStatement(queryCheckExistence)) {
+	                    checkStmt.setInt(1, idProduit);
+	                    checkStmt.setInt(2, idRack);
+	                    ResultSet rs = checkStmt.executeQuery();
+
+	                    if (rs.next()) {
+	                        try (PreparedStatement updateStmt = conn.prepareStatement(queryUpdateStock)) {
+	                            updateStmt.setInt(1, quantite);
+	                            updateStmt.setInt(2, idProduit);
+	                            updateStmt.setInt(3, idRack);
+	                            updateStmt.executeUpdate();
+	                        }
+	                    } else {
+	                        try (PreparedStatement insertStmt = conn.prepareStatement(queryInsertStock)) {
+	                            insertStmt.setInt(1, idProduit);
+	                            insertStmt.setInt(2, idRack);
+	                            insertStmt.setInt(3, quantite);
+	                            insertStmt.executeUpdate();
+	                        }
+	                    }
+	                }
+	            }
+
+	            return true;
+	        } catch (IOException | SQLException e) {
+	            e.printStackTrace();
+	            return false;
+	        }
+	    }
+	}
+

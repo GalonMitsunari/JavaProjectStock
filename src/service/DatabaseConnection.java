@@ -94,4 +94,21 @@ public class DatabaseConnection {
 		}
 		return rows;
 	}
+	/*public void vidage() {
+		        String[] tables = {"Custommer", "Options", "Orders", "Stock", "MDTE"};
+
+		        try (Connection conn = connectToBDD()) {
+		            Statement stmt = conn.createStatement();
+
+		            for (String table : tables) {
+		                String query = "TRUNCATE TABLE " + table;
+		                System.out.println("Vidage de la table : " + table);
+		                stmt.executeUpdate(query);
+		            }
+		            System.out.println("Toutes les tables ont été vidées.");
+
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		    }*/
 }

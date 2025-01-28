@@ -94,7 +94,7 @@ public class ProduitDAO {
 	public List<Produit> getMissingStocks() throws SQLException {
 		    List<Produit> produitsManquants = new ArrayList<>();
 
-		    String query = "SELECT p.id, p.nom, p.description, p.code_barre, p.categorie, p.quantite_min, "
+		    String query = "SELECT p.id, p.nom, p.description, p.code_barre, p.categorie,p.date_creation, p.quantite_min, "
 		            + "IFNULL(s.quantite, 0) AS quantite_disponible "
 		            + "FROM Produit p "
 		            + "LEFT JOIN Stock s ON p.id = s.id_produit "
