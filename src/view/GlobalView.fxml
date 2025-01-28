@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <TabPane stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="controller.GlobalController">
+
     <Tab text="Produits">
         <VBox alignment="CENTER" spacing="10">
             <Label style="-fx-font-size: 16px;" text="Gestion des Produits" />
@@ -19,7 +20,7 @@
             <HBox spacing="10">
                 <TextField fx:id="produitNomField" promptText="Nom du produit" />
                 <TextField fx:id="produitCodeBarreField" promptText="Code-barres" />
-                <TextField fx:id="produitCategorieField" promptText="Catï¿½gorie" />
+                <TextField fx:id="produitCategorieField" promptText="Catégorie" />
             </HBox>
             <HBox spacing="10">
                 <Button onAction="#addProduit" text="Ajouter" />
@@ -42,23 +43,30 @@
             </HBox>
         </VBox>
     </Tab>
-    
-<Tab text="Stock Actuel">
-    <VBox spacing="10" alignment="CENTER">
-        <Label text="Stock Actuel des Produits" style="-fx-font-size: 16px;" />
-        <ListView fx:id="stockListView" prefHeight="200" prefWidth="600" />
-        <HBox spacing="10">
-            <TextField fx:id="produitColumn" promptText="Produit" />
-            <TextField fx:id="quantiteColumn" promptText="Quantité Disponible" />
-        </HBox>
-        <HBox spacing="10" alignment="CENTER">
-            <Button text="Importer CSV depuis FTP" onAction="#handleFTPImport" />
-        </HBox>
-        
-    </VBox>
-</Tab>
 
+    <Tab text="Stock Actuel">
+        <VBox spacing="10" alignment="CENTER">
+            <Label text="Stock Actuel des Produits" style="-fx-font-size: 16px;" />
+            <ListView fx:id="stockListView" prefHeight="200" prefWidth="600" />
+            <HBox spacing="10" alignment="CENTER">
+                <Button text="Importer CSV depuis FTP" onAction="#handleFTPImport" />
+            </HBox>
+        </VBox>
+    </Tab>
 
+    <Tab text="Export Stocks Manquants">
+        <VBox alignment="CENTER" spacing="10">
+            <Label style="-fx-font-size: 16px;" text="Exporter les Stocks Manquants pour Achat" />
+            <Button onAction="#exportMissingStocksForAchat" text="Exporter les stocks manquants" />
+        </VBox>
+    </Tab>
+
+    <Tab text="Import Stocks Reçus">
+        <VBox alignment="CENTER" spacing="10">
+            <Label style="-fx-font-size: 16px;" text="Importer les Stocks Reçus d'Achat" />
+            <Button onAction="#importStocksFromAchat" text="Importer les stocks reçus" />
+        </VBox>
+    </Tab>
 
     <Tab text="Mouvements de Stock">
         <VBox alignment="CENTER" spacing="10">
@@ -66,7 +74,7 @@
             <ListView fx:id="mouvementListView" prefHeight="200" prefWidth="400" />
             <HBox spacing="10">
                 <TextField fx:id="mouvementProduitField" promptText="ID Produit" />
-                <TextField fx:id="mouvementQuantiteField" promptText="Quantitée" />
+                <TextField fx:id="mouvementQuantiteField" promptText="Quantité" />
                 <TextField fx:id="mouvementRackField" promptText="ID Rack (optionnel)" />
             </HBox>
             <HBox spacing="10">
@@ -83,10 +91,11 @@
                 <columns>
                     <TableColumn fx:id="typeColumn" text="Type" />
                     <TableColumn fx:id="produitColumn" text="Produit" />
-                    <TableColumn fx:id="quantiteColumn" text="Quantitée" />
+                    <TableColumn fx:id="quantiteColumn" text="Quantité" />
                     <TableColumn fx:id="dateColumn" text="Date" />
                 </columns>
             </TableView>
         </VBox>
     </Tab>
+    
 </TabPane>

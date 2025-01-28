@@ -34,7 +34,8 @@ public class ProduitDAO {
 				produits.add(new Produit(rs.getInt("id"), rs.getString("nom"),
 						rs.getString("description"), rs.getString("code_barre"),
 						rs.getString("categorie"),
-						rs.getTimestamp("date_creation").toLocalDateTime()));
+						rs.getTimestamp("date_creation").toLocalDateTime(),
+				                    rs.getInt("quantite_min")));
 			}
 		}
 		return produits;
@@ -47,12 +48,17 @@ public class ProduitDAO {
 			pstmt.setInt(1, id);
 			try (ResultSet rs = pstmt.executeQuery()) {
 				if (rs.next()) {
-					return new Produit(rs.getInt("id"), rs.getString("nom"),
-							rs.getString("description"),
-							rs.getString("code_barre"),
-							rs.getString("categorie"),
-							rs.getTimestamp("date_creation")
-									.toLocalDateTime());
+					return new Produit(
+							    rs.getInt("id"), 
+							    rs.getString("nom"),
+							    rs.getString("description"),
+							    rs.getString("code_barre"),
+							    rs.getString("categorie"),
+							    rs.getTimestamp("date_creation") != null 
+							        ? rs.getTimestamp("date_creation").toLocalDateTime() 
+							        : null,
+							    rs.getInt("quantite_min") // Ajoute la gestion de `quantite_min` si elle existe dans votre constructeur
+							);
 				}
 			}
 		}
@@ -84,4 +90,35 @@ public class ProduitDAO {
 	public List<Produit> getAllProduits() throws SQLException {
 		return readAll();
 	}
+
+	public List<Produit> getMissingStocks() throws SQLException {
+		    List<Produit> produitsManquants = new ArrayList<>();
+
+		    String query = "SELECT p.id, p.nom, p.description, p.code_barre, p.categorie, p.quantite_min, "
+		            + "IFNULL(s.quantite, 0) AS quantite_disponible "
+		            + "FROM Produit p "
+		            + "LEFT JOIN Stock s ON p.id = s.id_produit "
+		            + "WHERE IFNULL(s.quantite, 0) < p.quantite_min";
+
+		    try (Connection conn = DatabaseConnection.connectToBDD();
+		         PreparedStatement pstmt = conn.prepareStatement(query);
+		         ResultSet rs = pstmt.executeQuery()) {
+
+		        while (rs.next()) { 
+		            produitsManquants.add(new Produit(
+		                    rs.getInt("id"),
+		                    rs.getString("nom"),
+		                    rs.getString("description"),
+		                    rs.getString("code_barre"),
+		                    rs.getString("categorie"),
+		                    rs.getTimestamp("date_creation") != null
+		                            ? rs.getTimestamp("date_creation").toLocalDateTime()
+		                            : null,
+		                    rs.getInt("quantite_min") 
+		            ));
+		        }
+		    }
+
+		    return produitsManquants;
+		}
 }

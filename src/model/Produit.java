@@ -9,16 +9,26 @@ public class Produit {
 	private String codeBarre;
 	private String categorie;
 	private LocalDateTime dateCreation;
+	private int quantiteMin;
 
 	public Produit(int id, String nom, String description, String codeBarre, String categorie,
-			LocalDateTime dateCreation) {
+			LocalDateTime dateCreation, int quantiteMin) {
 		this.id = id;
 		this.nom = nom;
 		this.description = description;
 		this.codeBarre = codeBarre;
 		this.categorie = categorie;
-		this.dateCreation = dateCreation;
-	}
+		this.quantiteMin = quantiteMin;
+	    }
+
+	    public int getQuantiteMin() {
+	        return quantiteMin;
+	    }
+
+	    public void setQuantiteMin(int quantiteMin) {
+	        this.quantiteMin = quantiteMin;
+	    }
+	
 
 	public int getId() {
 		return id;

@@ -8,9 +8,11 @@ import model.Produit;
 import model.Rack;
 import model.Stock;
 import service.FTPService;
+import utils.CSVGenerator;
 import model.FichierHistorique;
 import model.MouvementStock;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -114,7 +116,7 @@ public class GlobalController {
 		try {
 			Produit produit = new Produit(0, produitNomField.getText(), null,
 					produitCodeBarreField.getText(), produitCategorieField.getText(),
-					null);
+					null, 0);
 			produitDAO.create(produit);
 			loadProduits();
 		} catch (SQLException e) {
@@ -286,4 +288,99 @@ public class GlobalController {
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
+	@FXML
+	private void generateMissingStocksCSV() {
+	    try {
+	        List<Produit> produitsManquants = produitDAO.getMissingStocks();
+
+	        if (produitsManquants == null || produitsManquants.isEmpty()) {
+	            showInfo("Aucun stock manquant", "Tous les produits ont un stock suffisant.");
+	            return;
+	        }
+	        List<String[]> data = new ArrayList<>();
+	        for (Produit produit : produitsManquants) {
+	            String[] row = {
+	                String.valueOf(produit.getId()),        
+	                String.valueOf(produit.getQuantiteMin())
+	            };
+	            data.add(row);
+	        }
+
+	        String filePath = "C:/Users/Eleve/Downloads/stocks_manquants.csv";
+	        String[] header = {"id_produit", "quantite_min"}; //
+
+	        CSVGenerator.generateCSV(filePath, data, header);
+
+	        showInfo("Fichier généré", "Le fichier des stocks manquants a été généré avec succès :\n" + filePath);
+
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        showError("Erreur IO", "Une erreur est survenue lors de la génération du fichier CSV.");
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        showError("Erreur SQL", "Impossible de récupérer les stocks manquants depuis la base de données.");
+	    }
+	}
+	@FXML
+	private void exportMissingStocksForAchat() {
+	    try {
+	        List<Produit> produitsManquants = produitDAO.getMissingStocks();
+
+	        if (produitsManquants == null || produitsManquants.isEmpty()) {
+	            showInfo("Aucun stock manquant", "Tous les produits ont un stock suffisant.");
+	            return;
+	        }
+
+	        List<String[]> data = new ArrayList<>();
+	        for (Produit produit : produitsManquants) {
+	            String[] row = {
+	                String.valueOf(produit.getId()),                               
+	                String.valueOf(produit.getQuantiteMin()) 
+	            };
+	            data.add(row);
+	        }
+
+	        String filePath = "C:/Users/Eleve/Downloads/achat_stocks_manquants.csv";
+	        String[] header = {"id_produit", "quantite_min"};
+
+	        CSVGenerator.generateCSV(filePath, data, header);
+
+	        showInfo("Fichier généré", "Le fichier des stocks manquants à envoyer à Achat a été généré :\n" + filePath);
+
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        showError("Erreur IO", "Une erreur est survenue lors de la génération du fichier CSV.");
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        showError("Erreur SQL", "Impossible de récupérer les stocks manquants depuis la base de données.");
+	    }
+	}
+	@FXML
+	private void importStocksFromAchat() {
+	    FTPService ftpService = new FTPService();
+	    ImportCSVDAO importCSVDAO = new ImportCSVDAO();
+
+	
+	    String remoteFile = "/Achat/StocksRecus.csv";
+	    String localFile = "C:/Users/Eleve/Downloads/StocksRecus.csv";
+
+	   
+	    String downloadResult = ftpService.downloadCSV(remoteFile, localFile);
+	    if (!downloadResult.contains("succès")) {
+	        showError("Erreur FTP", "Impossible de télécharger le fichier depuis Achat.");
+	        return;
+	    }
+
+	   
+	    boolean importSuccess = importCSVDAO.importCSVToDatabase(localFile);
+
+	    if (importSuccess) {
+	        showInfo("Succès", "Les stocks reçus d'Achat ont été importés avec succès.");
+	        loadStocks(); 
+	    } else {
+	        showError("Erreur", "L'importation des stocks reçus d'Achat a échoué.");
+	    }
+	}
+
+
 }

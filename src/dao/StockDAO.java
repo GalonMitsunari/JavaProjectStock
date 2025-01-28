@@ -3,6 +3,9 @@ package dao;
 import model.Stock;
 import service.DatabaseConnection;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,5 +80,31 @@ public class StockDAO {
 		}
 		return null;
 	}
+	public void updateStocksFromCSV(String filePath) throws SQLException, IOException {
+		    String query = "UPDATE Stock SET quantite = quantite + ? WHERE id_produit = ?";
+
+		    try (BufferedReader br = new BufferedReader(new FileReader(filePath));
+		         Connection conn = DatabaseConnection.connectToBDD();
+		         PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+		        String line;
+		        boolean isHeader = true;
+
+		        while ((line = br.readLine()) != null) {
+		            if (isHeader) { // Ignorer l'en-tête
+		                isHeader = false;
+		                continue;
+		            }
+		            String[] data = line.split(",");
+		            int idProduit = Integer.parseInt(data[0]);
+		            int quantite = Integer.parseInt(data[1]);
+
+		            pstmt.setInt(1, quantite);
+		            pstmt.setInt(2, idProduit);
+		            pstmt.executeUpdate();
+		        }
+		    }
+		}
+
 
 }
