@@ -398,23 +398,42 @@ public class GlobalController {
 	    @FXML
 	    private void generateConfirmationForFab() {
 	        try {
-	            List<String[]> stocksRecus = getStocksRecus();
+	            List<String[]> stocksRecus = getStocksRecusFromDatabase(); 
+
+	            if (stocksRecus.isEmpty()) {
+	                showInfo("Aucune confirmation", "Aucun stock reçu à confirmer pour Fab.");
+	                return;
+	            }
 
 	            String filePath = "C:/Users/Eleve/Downloads/confirmation_fab.csv";
 	            String[] header = {"id_produit", "quantite_recue"};
+
 	            CSVGenerator.generateCSV(filePath, stocksRecus, header);
 
 	            showInfo("Fichier généré", "La confirmation pour Fab a été générée :\n" + filePath);
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	            showError("Erreur IO", "Erreur lors de la génération du fichier de confirmation pour Fab.");
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	            showError("Erreur SQL", "Impossible de récupérer les stocks reçus depuis la base de données.");
 	        }
 	    }
 
-	    private List<String[]> getStocksRecus() {
+	    private List<String[]> getStocksRecusFromDatabase() throws SQLException {
 	        List<String[]> stocksRecus = new ArrayList<>();
-	        stocksRecus.add(new String[]{"1", "100"});
-	        stocksRecus.add(new String[]{"2", "150"});
+
+	        List<Stock> stocks = stockDAO.getAllStocks(); 
+	        for (Stock stock : stocks) {
+	            if (stock.getQuantite() > 0) { 
+	                stocksRecus.add(new String[]{
+	                    String.valueOf(stock.getIdProduit()),
+	                    String.valueOf(stock.getQuantite())
+	                });
+	            }
+	        }
+
 	        return stocksRecus;
 	    }
+
 	}
