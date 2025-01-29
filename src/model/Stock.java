@@ -8,7 +8,8 @@ public class Stock {
 	private int idRack;
 	private int quantite;
 	private Timestamp dateAjout;
-	private String nomProduit = "toto";
+	private String nomProduit;
+	private String descriptionProduit;
 
 	public String getNomProduit() {
 	    return nomProduit;
@@ -71,5 +72,13 @@ public class Stock {
 
 	public void setDateAjout(Timestamp dateAjout) {
 		this.dateAjout = dateAjout;
+	}
+
+	public String getDescriptionProduit() {
+		return descriptionProduit;
+	}
+
+	public void setDescriptionProduit(String descriptionProduit) {
+		this.descriptionProduit = descriptionProduit;
 	}
 }

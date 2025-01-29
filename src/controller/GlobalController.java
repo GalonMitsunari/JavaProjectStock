@@ -1,31 +1,29 @@
 package controller;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import model.Produit;
-import model.Rack;
-import model.Stock;
-import service.FTPService;
-import utils.CSVGenerator;
-import utils.CSVReaderUtil;
-import model.FichierHistorique;
-import model.MouvementStock;
-
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.logging.Logger;
 
 import dao.ImportCSVDAO;
 import dao.MouvementStockDAO;
 import dao.ProduitDAO;
 import dao.RackDAO;
 import dao.StockDAO;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import model.MouvementStock;
+import model.Produit;
+import model.Rack;
+import model.Stock;
+import service.FTPService;
+import utils.CSVGenerator;
+import utils.CSVReaderUtil;
 
 public class GlobalController {
 
@@ -52,6 +50,8 @@ public class GlobalController {
 	private ListView<String> stockListView;
 	private TextField produitColumn, quantiteColumn;
 	private List<String[]> manquantsPourAchat = new ArrayList<>();
+	private static final Logger logger = Logger.getLogger(GlobalController.class.getName());
+
 
 	private final ProduitDAO produitDAO = new ProduitDAO();
 	private final RackDAO rackDAO = new RackDAO();
@@ -95,11 +95,13 @@ public class GlobalController {
 		try {
 			List<Stock> stocks = stockDAO.getAllStocks();
 			List<String> stockDisplayList = new ArrayList<>();
+			
 
 			for (Stock stock : stocks) {
 				Produit produit = produitDAO.readProduitById(stock.getIdProduit());
 				String produitNom = (produit != null) ? produit.getNom() : "Produit inconnu";
-				String stockInfo = "Produit : " + produitNom + ", Quantité : "
+				String produitDescription = (produit != null) ? produit.getDescription() : "Produit inconnu";
+				String stockInfo = "Produit : " + produitNom + " " + produitDescription + ", Quantité : "
 						+ stock.getQuantite();
 				stockDisplayList.add(stockInfo);
 			}
@@ -259,41 +261,45 @@ public class GlobalController {
 
 	@FXML
 	private void handleFTPImport() {
-		FTPService ftpService = new FTPService();
-		ImportCSVDAO importCSVDAO = new ImportCSVDAO();
+		    FTPService ftpService = new FTPService();
+		    ImportCSVDAO importCSVDAO = new ImportCSVDAO();
 
-		String remoteFile = "/CCI/Stock.csv";
-		String localFile = "C:/Users/Eleve/Downloads/Stock.csv";
+		    String remoteFile = "/CCI/Stock.csv";
+		    String localFile = "C:/Users/Eleve/Downloads/Stock.csv";
 
-		String downloadResult = ftpService.downloadCSV(remoteFile, localFile);
-		if (!downloadResult.contains("succès")) {
-			showError("Erreur FTP", "Impossible de télécharger le fichier.");
-			return;
+		    String downloadResult = ftpService.downloadCSV(remoteFile, localFile);
+		    if (downloadResult.contains("Erreur")) {
+		        showError("Erreur FTP", downloadResult);
+		        return;
+		    }
+
+		    boolean importSuccess = importCSVDAO.importCSVToDatabase(localFile);
+		    if (importSuccess) {
+		        showInfo("Succès", "Le fichier a été importé avec succès dans la base de données.");
+		        loadStocks();
+		    } else {
+		        showError("Erreur", "L'importation du fichier dans la base de données a échoué.");
+		    }
 		}
 
-		boolean importSuccess = importCSVDAO.importCSVToDatabase(localFile);
+	    private void showError(String title, String message) {
+		        logger.severe("Erreur: " + message);
+		        Alert alert = new Alert(Alert.AlertType.ERROR);
+		        alert.setTitle(title);
+		        alert.setHeaderText("Détails de l'erreur");
+		        alert.setContentText(message);
+		        alert.showAndWait();
+		    }
 
-		if (importSuccess) {
-			showInfo("Succès", "Le fichier a été importé avec succès dans la base de données.");
-			loadStocks();
-		} else {
-			showError("Erreur", "L'importation du fichier dans la base de données a échoué.");
-		}
-	}
+		    private void showInfo(String title, String message) {
+		        logger.info("Info: " + message);
+		        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		        alert.setTitle(title);
+		        alert.setHeaderText(null);
+		        alert.setContentText(message);
+		        alert.showAndWait();
+		    }
 
-	private void showInfo(String title, String message) {
-		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle(title);
-		alert.setContentText(message);
-		alert.showAndWait();
-	}
-
-	private void showError(String title, String message) {
-		Alert alert = new Alert(Alert.AlertType.ERROR);
-		alert.setTitle(title);
-		alert.setContentText(message);
-		alert.showAndWait();
-	}
 
 	@FXML
 	private void importFabNeeds() {
@@ -332,7 +338,7 @@ public class GlobalController {
 	        }
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	        showError("Erreur", "Erreur lors de l'importation des besoins de Fab.");
+	        showError("Erreur Fichier", "Erreur lors de l'importation des besoins de Fab.");
 	    }
 	}
 
@@ -385,7 +391,7 @@ public class GlobalController {
 	            generateConfirmationForFab();
 	        } catch (Exception e) {
 	            e.printStackTrace();
-	            showError("Erreur", "Erreur lors de l'importation des stocks reçus d'Achat.");
+	            showError("Erreur Fichier", "Erreur lors de l'importation des stocks reçus d'Achat.");
 	        }
 	    }
 
@@ -411,7 +417,4 @@ public class GlobalController {
 	        stocksRecus.add(new String[]{"2", "150"});
 	        return stocksRecus;
 	    }
-
-
-
 	}

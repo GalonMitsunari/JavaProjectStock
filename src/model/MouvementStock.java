@@ -78,5 +78,13 @@ public class MouvementStock {
 	           ", Rack ID: " + (idRack);
 	}
 
+	public Rack getRack() {
+		return rack;
+	}
+
+	public void setRack(Rack rack) {
+		this.rack = rack;
+	}
+
 
 }

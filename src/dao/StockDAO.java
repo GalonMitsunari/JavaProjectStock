@@ -74,6 +74,7 @@ public class StockDAO {
 							rs.getInt("id_rack"), rs.getInt("quantite"),
 							rs.getTimestamp("date_ajout"));
 					stock.setNomProduit(rs.getString("produit_nom"));
+					stock.setDescriptionProduit(rs.getString("produit_description"));
 					return stock;
 				}
 			}
